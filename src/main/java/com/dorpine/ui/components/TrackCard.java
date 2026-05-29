@@ -86,15 +86,17 @@ public class TrackCard extends StackPane {
         titleLbl.setFont(Fonts.heading(14));
         titleLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         titleLbl.setWrapText(true);
-        titleLbl.setMaxWidth(150);
         titleLbl.setAlignment(Pos.CENTER);
+        titleLbl.setPrefWidth(150);
+        titleLbl.setMaxWidth(150);
 
         Label artistLbl = new Label(artist != null && !artist.isEmpty() ? artist : " ");
         artistLbl.setFont(Fonts.body(12));
         artistLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
         artistLbl.setWrapText(true);
-        artistLbl.setMaxWidth(150);
         artistLbl.setAlignment(Pos.CENTER);
+        artistLbl.setPrefWidth(150);
+        artistLbl.setMaxWidth(150);
 
         content.getChildren().addAll(imgPane, titleLbl, artistLbl);
         getChildren().add(content);

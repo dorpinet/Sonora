@@ -3,6 +3,7 @@ package com.dorpine;
 import com.dorpine.model.Note;
 import com.dorpine.model.Track;
 import com.dorpine.ui.components.DetailsPanel;
+import com.dorpine.ui.components.TopBar;
 import com.dorpine.ui.screens.*;
 import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
@@ -13,6 +14,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -38,22 +40,30 @@ public class App extends Application {
 
         HBox mainBox = new HBox();
 
+        VBox leftPanel = new VBox();
+        leftPanel.setSpacing(12);
+        leftPanel.setPadding(new Insets(16, 0, 0, 0));
+        HBox.setHgrow(leftPanel, Priority.ALWAYS);
+
+        TopBar topBar = new TopBar(this::navigateTo, () -> Platform.runLater(this::toggleTheme));
+        topBar.setPadding(new Insets(0, 20, 0, 20));
+
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setPannable(true);
         scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
-        scrollPane.setPrefWidth(800);
-        HBox.setHgrow(scrollPane, Priority.ALWAYS);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        HomeScreen homeScreen = new HomeScreen(this::navigateTo, this::showDetails);
+        scrollPane.setContent(homeScreen);
+
+        leftPanel.getChildren().addAll(topBar, scrollPane);
 
         detailsPanel = new DetailsPanel(this::navigateTo);
 
-        scrollPane.setContent(new HomeScreen(this::navigateTo, this::showDetails, () -> {
-            Platform.runLater(this::toggleTheme);
-        }));
-
-        mainBox.getChildren().addAll(scrollPane, detailsPanel);
+        mainBox.getChildren().addAll(leftPanel, detailsPanel);
         root.getChildren().add(mainBox);
     }
 
@@ -70,7 +80,6 @@ public class App extends Application {
             if (sid != null && !sid.isEmpty()) {
                 new Thread(() -> {
                     String url = com.dorpine.api.ApiClient.getPreviewUrl(sid);
-                    System.out.println("[Details] Got preview URL: " + url);
                     Platform.runLater(() -> detailsPanel.setPreviewUrl(url));
                 }).start();
             } else {
@@ -82,7 +91,6 @@ public class App extends Application {
             if (sid != null && !sid.isEmpty()) {
                 new Thread(() -> {
                     String url = com.dorpine.api.ApiClient.getPreviewUrl(sid);
-                    System.out.println("[Details] Got preview URL: " + url);
                     Platform.runLater(() -> detailsPanel.setPreviewUrl(url));
                 }).start();
             } else {
