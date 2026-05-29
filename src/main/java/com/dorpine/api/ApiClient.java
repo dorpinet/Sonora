@@ -26,79 +26,96 @@ public class ApiClient {
 
     public static List<Track> getTracks(String genre) {
         try {
-            String url = BASE_URL + "/tracks";
-            if (genre != null && !genre.isEmpty()) {
-                url += "?genre=" + genre;
-            }
+            String url = BASE_URL + "/tracks" + (genre != null && !genre.isEmpty() ? "?genre=" + genre : "");
+            System.out.println("[API] GET " + url);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Accept", "application/json")
                     .GET()
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("[API] Response " + response.statusCode() + ": " + response.body().substring(0, Math.min(200, response.body().length())));
             if (response.statusCode() == 200) {
                 JsonNode root = MAPPER.readTree(response.body());
                 JsonNode tracksNode = root.get("tracks");
                 if (tracksNode != null && tracksNode.isArray()) {
                     List<Track> tracks = new ArrayList<>();
                     for (JsonNode node : tracksNode) {
-                        tracks.add(MAPPER.treeToValue(node, Track.class));
+                        try {
+                            tracks.add(MAPPER.treeToValue(node, Track.class));
+                        } catch (Exception ex) {
+                            System.err.println("[API] Failed to parse track: " + ex.getMessage());
+                        }
                     }
+                    System.out.println("[API] Parsed " + tracks.size() + " tracks");
                     return tracks;
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed to fetch tracks: " + e.getMessage());
+            System.err.println("[API] Failed to fetch tracks: " + e.getMessage());
+            e.printStackTrace();
         }
         return Collections.emptyList();
     }
 
     public static List<Note> getNotes() {
         try {
+            String url = BASE_URL + "/notes";
+            System.out.println("[API] GET " + url);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/notes"))
+                    .uri(URI.create(url))
                     .header("Accept", "application/json")
                     .GET()
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("[API] Response " + response.statusCode() + ": " + response.body().substring(0, Math.min(200, response.body().length())));
             if (response.statusCode() == 200) {
                 JsonNode root = MAPPER.readTree(response.body());
                 JsonNode notesNode = root.get("notes");
                 if (notesNode != null && notesNode.isArray()) {
                     List<Note> notes = new ArrayList<>();
                     for (JsonNode node : notesNode) {
-                        notes.add(MAPPER.treeToValue(node, Note.class));
+                        try {
+                            notes.add(MAPPER.treeToValue(node, Note.class));
+                        } catch (Exception ex) {
+                            System.err.println("[API] Failed to parse note: " + ex.getMessage());
+                        }
                     }
+                    System.out.println("[API] Parsed " + notes.size() + " notes");
                     return notes;
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed to fetch notes: " + e.getMessage());
+            System.err.println("[API] Failed to fetch notes: " + e.getMessage());
+            e.printStackTrace();
         }
         return Collections.emptyList();
     }
 
     public static List<String> getGenres() {
         try {
+            String url = BASE_URL + "/tracks/genres";
+            System.out.println("[API] GET " + url);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/tracks/genres"))
+                    .uri(URI.create(url))
                     .header("Accept", "application/json")
                     .GET()
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("[API] Response " + response.statusCode() + ": " + response.body().substring(0, Math.min(200, response.body().length())));
             if (response.statusCode() == 200) {
                 JsonNode root = MAPPER.readTree(response.body());
                 JsonNode genresNode = root.get("genres");
                 if (genresNode != null && genresNode.isArray()) {
                     List<String> genres = new ArrayList<>();
-                    for (JsonNode g : genresNode) {
-                        genres.add(g.asText());
-                    }
+                    for (JsonNode g : genresNode) genres.add(g.asText());
+                    System.out.println("[API] Parsed " + genres.size() + " genres");
                     return genres;
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed to fetch genres: " + e.getMessage());
+            System.err.println("[API] Failed to fetch genres: " + e.getMessage());
+            e.printStackTrace();
         }
         return Collections.emptyList();
     }
@@ -123,7 +140,7 @@ public class ApiClient {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed to fetch playlists: " + e.getMessage());
+            System.err.println("[API] Failed to fetch playlists: " + e.getMessage());
         }
         return Collections.emptyList();
     }
@@ -144,7 +161,7 @@ public class ApiClient {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed to fetch preview: " + e.getMessage());
+            System.err.println("[API] Failed to fetch preview: " + e.getMessage());
         }
         return null;
     }

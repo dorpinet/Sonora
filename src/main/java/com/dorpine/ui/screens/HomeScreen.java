@@ -7,6 +7,7 @@ import com.dorpine.model.Track;
 import com.dorpine.ui.components.HorizontalCarousel;
 import com.dorpine.ui.components.TopBar;
 import com.dorpine.ui.components.TrackCard;
+import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -31,7 +32,7 @@ public class HomeScreen extends VBox {
         this.toggleTheme = toggleTheme;
         setSpacing(0);
         setFillWidth(true);
-        setPadding(new Insets(0, 0, 40, 0));
+        setPadding(new Insets(24, 0, 40, 0));
 
         sectionsBox = new VBox(40);
         sectionsBox.setFillWidth(true);
@@ -100,7 +101,8 @@ public class HomeScreen extends VBox {
 
     private void addSectionTitle(String text) {
         Label lbl = new Label(text);
-        lbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 24px; -fx-font-weight: bold;");
+        lbl.setFont(Fonts.heading(24));
+        lbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         lbl.setPadding(new Insets(8, 0, 0, 0));
         sectionsBox.getChildren().add(lbl);
     }

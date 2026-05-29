@@ -4,6 +4,7 @@ import com.dorpine.model.Note;
 import com.dorpine.model.Track;
 import com.dorpine.ui.components.DetailsPanel;
 import com.dorpine.ui.screens.*;
+import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -20,6 +21,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
+        Fonts.load();
         root = new StackPane();
         root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
         showHome();
@@ -89,6 +91,7 @@ public class App extends Application {
     private void navigateTo(String screen) {
         if (screen.equals("home")) { showHome(); return; }
         root.getChildren().clear();
+        root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
         switch (screen) {
             case "settings" -> root.getChildren().add(new SettingsScreen(this::navigateTo));
             case "theory"   -> root.getChildren().add(new TheoryScreen(this::navigateTo));

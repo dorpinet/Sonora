@@ -3,6 +3,7 @@ package com.dorpine.ui.components;
 import com.dorpine.model.Note;
 import com.dorpine.model.Playlist;
 import com.dorpine.model.Track;
+import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -82,13 +83,15 @@ public class TrackCard extends StackPane {
         }
 
         Label titleLbl = new Label(title != null ? title : "Unknown");
-        titleLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 14px; -fx-font-weight: bold;");
+        titleLbl.setFont(Fonts.heading(14));
+        titleLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         titleLbl.setWrapText(true);
         titleLbl.setMaxWidth(140);
         titleLbl.setAlignment(Pos.CENTER);
 
         Label artistLbl = new Label(artist != null && !artist.isEmpty() ? artist : " ");
-        artistLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + "; -fx-font-size: 12px;");
+        artistLbl.setFont(Fonts.body(12));
+        artistLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
         artistLbl.setWrapText(true);
         artistLbl.setMaxWidth(140);
         artistLbl.setAlignment(Pos.CENTER);
@@ -107,7 +110,8 @@ public class TrackCard extends StackPane {
         p.setPrefSize(140, 140);
         p.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.5)")) + "; -fx-background-radius: 14px;");
         Label l = new Label(title != null && !title.isEmpty() ? title.substring(0, 1).toUpperCase() : "?");
-        l.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + "; -fx-font-size: 36px; -fx-font-weight: bold;");
+        l.setFont(Fonts.heading(36));
+        l.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + ";");
         p.getChildren().add(l);
         return p;
     }

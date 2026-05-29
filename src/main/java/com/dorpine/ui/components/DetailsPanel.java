@@ -2,6 +2,7 @@ package com.dorpine.ui.components;
 
 import com.dorpine.model.Note;
 import com.dorpine.model.Track;
+import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -41,7 +42,8 @@ public class DetailsPanel extends VBox {
               "-fx-border-color: " + Theme.toCss(Theme.cardBorder()), "-fx-border-radius: 16px", "-fx-border-width: 1px");
 
         Label title = new Label("Details");
-        title.styleProperty().set("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 18px; -fx-font-weight: bold;");
+        title.setFont(Fonts.heading(18));
+        title.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
 
         coverPane = new StackPane();
         coverPane.setPrefSize(200, 200);
@@ -51,12 +53,14 @@ public class DetailsPanel extends VBox {
         showPlaceholder();
 
         nameLabel = new Label("Select a track");
-        nameLabel.styleProperty().set("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 16px; -fx-font-weight: bold;");
+        nameLabel.setFont(Fonts.heading(16));
+        nameLabel.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         nameLabel.setWrapText(true);
         nameLabel.setAlignment(Pos.CENTER);
 
         artistLabel = new Label("");
-        artistLabel.styleProperty().set("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + "; -fx-font-size: 14px;");
+        artistLabel.setFont(Fonts.body(14));
+        artistLabel.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
         artistLabel.setWrapText(true);
         artistLabel.setAlignment(Pos.CENTER);
 

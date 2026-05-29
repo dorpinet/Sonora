@@ -1,5 +1,6 @@
 package com.dorpine.ui.screens;
 
+import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -13,11 +14,13 @@ public class PlaylistDetailScreen extends VBox {
         setAlignment(Pos.CENTER); setSpacing(24); setPadding(new javafx.geometry.Insets(40));
         setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
         Label t = new Label(name);
-        t.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 32px; -fx-font-weight: bold;");
+        t.setFont(Fonts.heading(32));
+        t.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         Label s = new Label("Playlist details coming soon...");
-        s.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + "; -fx-font-size: 16px;");
+        s.setFont(Fonts.body(16));
+        s.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
         Button b = new Button("Back to Home");
-        b.setStyle(String.join(";", "-fx-background-color: " + Theme.toCss(Theme.accent()), "-fx-text-fill: white",
+        b.setStyle(String.join(";", "-fx-background-color: " + Theme.toCss(Theme.accent()), "-fx-text-fill: " + Theme.toCss(Theme.textPrimary()),
               "-fx-font-size: 14px", "-fx-padding: 12 24", "-fx-background-radius: 24px", "-fx-cursor: hand"));
         b.setOnAction(e -> nav.accept("home"));
         getChildren().addAll(t, s, b);

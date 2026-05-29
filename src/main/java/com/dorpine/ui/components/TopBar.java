@@ -1,5 +1,6 @@
 package com.dorpine.ui.components;
 
+import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,7 +13,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 
 import java.util.function.Consumer;
 
@@ -37,14 +37,14 @@ public class TopBar extends HBox {
 
         ImageView logo = new ImageView();
         try {
-            Image img = new Image(getClass().getResourceAsStream("/images/logo.ico"));
+            Image img = new Image(getClass().getResourceAsStream("/images/logo.png"));
             logo.setImage(img);
         } catch (Exception e) {
-            Rectangle placeholder = new Rectangle(28, 28);
-            placeholder.setArcWidth(6); placeholder.setArcHeight(6);
-            placeholder.setFill(Color.WHITE);
+            System.err.println("[TopBar] Failed to load logo: " + e.getMessage());
         }
-        logo.setFitWidth(28); logo.setFitHeight(28); logo.setPreserveRatio(true);
+        logo.setFitWidth(32);
+        logo.setFitHeight(32);
+        logo.setPreserveRatio(true);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -86,9 +86,9 @@ public class TopBar extends HBox {
     private Label navBtn(String text, boolean active) {
         String color = Theme.isDark() ? (active ? "#FFFFFF" : "rgba(255,255,255,0.65)") : "#000000";
         Label l = new Label(text);
+        l.setFont(Fonts.body(15));
         l.setStyle(String.join(";",
             "-fx-text-fill: " + color,
-            "-fx-font-size: 15px",
             "-fx-font-weight: " + (active ? "bold" : "normal"),
             "-fx-cursor: hand"
         ));

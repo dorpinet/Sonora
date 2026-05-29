@@ -12,17 +12,17 @@ public class Theme {
         darkMode = !darkMode;
     }
 
-    public static Color bgStart()    { return darkMode ? Color.web("#2D1B69") : Color.web("#D4C8FF"); }
-    public static Color bgEnd()      { return darkMode ? Color.web("#1a0a3e") : Color.web("#A898FF"); }
-    public static Color cardBg()     { return darkMode ? Color.web("rgba(255,255,255,0.08)") : Color.web("rgba(255,255,255,0.3)"); }
-    public static Color cardBorder() { return darkMode ? Color.web("rgba(255,255,255,0.15)") : Color.web("rgba(255,255,255,0.5)"); }
-    public static Color accent()     { return darkMode ? Color.web("#9B8CFF") : Color.web("#6C5CE7"); }
-    public static Color textPrimary(){ return darkMode ? Color.web("#F0F0F0") : Color.web("#000000"); }
-    public static Color textSecondary(){ return darkMode ? Color.web("#B0B0B0") : Color.web("#333333"); }
-    public static Color topBarBg()   { return darkMode ? Color.web("#3D2B8A") : Color.web("#8B7BFF"); }
-    public static Color detailsBg()  { return darkMode ? Color.web("rgba(60,40,120,0.5)") : Color.web("rgba(140,130,230,0.4)"); }
-    public static Color btnBg()      { return darkMode ? Color.web("rgba(255,255,255,0.12)") : Color.web("rgba(255,255,255,0.25)"); }
-    public static Color btnBorder()  { return darkMode ? Color.web("rgba(255,255,255,0.25)") : Color.web("rgba(255,255,255,0.5)"); }
+    public static Color bgStart()    { return darkMode ? Color.web("#0a0a12") : Color.web("#E8E0FF"); }
+    public static Color bgEnd()      { return darkMode ? Color.web("#1a0a2e") : Color.web("#C4B5FD"); }
+    public static Color cardBg()     { return darkMode ? Color.web("rgba(255,255,255,0.06)") : Color.web("rgba(255,255,255,0.5)"); }
+    public static Color cardBorder() { return darkMode ? Color.web("rgba(255,255,255,0.12)") : Color.web("rgba(255,255,255,0.6)"); }
+    public static Color accent()     { return darkMode ? Color.web("#8B5CF6") : Color.web("#7C3AED"); }
+    public static Color textPrimary(){ return darkMode ? Color.web("#FFFFFF") : Color.web("#000000"); }
+    public static Color textSecondary(){ return darkMode ? Color.web("#A0A0A0") : Color.web("#333333"); }
+    public static Color topBarBg()   { return darkMode ? Color.web("#0f0f1e") : Color.web("#A78BFA"); }
+    public static Color detailsBg()  { return darkMode ? Color.web("rgba(30,20,60,0.6)") : Color.web("rgba(140,130,230,0.4)"); }
+    public static Color btnBg()      { return darkMode ? Color.web("rgba(139,92,246,0.2)") : Color.web("rgba(124,58,237,0.15)"); }
+    public static Color btnBorder()  { return darkMode ? Color.web("rgba(139,92,246,0.4)") : Color.web("rgba(124,58,237,0.3)"); }
 
     public static String GRADIENT_CSS() {
         return String.format("linear-gradient(to bottom, %s, %s)", toCss(bgStart()), toCss(bgEnd()));
