@@ -68,7 +68,7 @@ async function seed() {
       const hashedPassword = await bcrypt.hash('DemoPass123!', 10);
       user = await User.create({
         email: 'demo@sonora.app',
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         username: 'demo_user',
         interests: ['sport', 'meditation'],
         isVerified: true,
