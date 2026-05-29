@@ -1,0 +1,36 @@
+{
+  "name": "sonora-backend",
+  "version": "1.0.0",
+  "description": "Sonora music app backend - Node.js + Express + MongoDB",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "music",
+    "spotify",
+    "mongo",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.3",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.3.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^7.2.0",
+    "mongoose": "^8.4.0",
+    "node-cron": "^3.0.3",
+    "qrcode": "^1.5.3",
+    "spotify-web-api-node": "^5.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  }
+}
