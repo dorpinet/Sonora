@@ -37,7 +37,7 @@ public class DetailsPanel extends VBox {
         setPrefWidth(280);
         setMinWidth(260);
         setMaxWidth(320);
-        style("-fx-background-radius: 16px", "-fx-background-color: " + Theme.toCss(Theme.detailsBg()),
+        style(this, "-fx-background-radius: 16px", "-fx-background-color: " + Theme.toCss(Theme.detailsBg()),
               "-fx-border-color: " + Theme.toCss(Theme.cardBorder()), "-fx-border-radius: 16px", "-fx-border-width: 1px");
 
         Label title = new Label("Details");
