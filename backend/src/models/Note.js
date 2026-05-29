@@ -19,6 +19,10 @@ const noteSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  spotifyId: {
+    type: String,
+    default: null,
+  },
   duration: {
     type: Number,
     default: 30,

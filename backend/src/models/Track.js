@@ -23,6 +23,10 @@ const trackSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  spotifyId: {
+    type: String,
+    default: null,
+  },
   audioUrl: {
     type: String,
     default: null,
