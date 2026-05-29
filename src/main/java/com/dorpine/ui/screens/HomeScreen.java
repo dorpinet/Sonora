@@ -7,7 +7,12 @@ import com.dorpine.model.Track;
 import com.dorpine.ui.components.HorizontalCarousel;
 import com.dorpine.ui.components.TopBar;
 import com.dorpine.ui.components.TrackCard;
+import com.dorpine.util.Theme;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -26,9 +31,11 @@ public class HomeScreen extends VBox {
         this.toggleTheme = toggleTheme;
         setSpacing(0);
         setFillWidth(true);
+        setPadding(new Insets(0, 0, 40, 0));
 
-        sectionsBox = new VBox(28);
+        sectionsBox = new VBox(40);
         sectionsBox.setFillWidth(true);
+        sectionsBox.setPadding(new Insets(0, 24, 0, 24));
 
         sectionsBox.getChildren().add(new TopBar(s -> {
             if (!s.equals("home")) navHandler.accept(s);
@@ -54,7 +61,8 @@ public class HomeScreen extends VBox {
                     if (!s.equals("home")) navHandler.accept(s);
                 }, toggleTheme));
 
-                HorizontalCarousel notesSection = new HorizontalCarousel("Sheet notes", new ArrayList<>(), 3);
+                addSectionTitle("Sheet notes");
+                HorizontalCarousel notesSection = new HorizontalCarousel("", new ArrayList<>(), 3);
                 sectionsBox.getChildren().add(notesSection);
                 if (!notes.isEmpty()) {
                     List<TrackCard> noteCards = new ArrayList<>();
@@ -62,18 +70,19 @@ public class HomeScreen extends VBox {
                     notesSection.setCards(noteCards);
                 }
 
-                HorizontalCarousel playlistsSection = new HorizontalCarousel("My playlists", new ArrayList<>(), 3);
-                sectionsBox.getChildren().add(playlistsSection);
-                List<TrackCard> playlistCards = new ArrayList<>();
+                addSectionTitle("My playlists");
+                HBox playlistsBox = new HBox(20);
+                playlistsBox.setAlignment(Pos.CENTER);
                 for (Playlist p : stubPlaylists) {
-                    playlistCards.add(new TrackCard(p, item -> {
+                    playlistsBox.getChildren().add(new TrackCard(p, item -> {
                         if (item instanceof Playlist pl) navHandler.accept("playlist:" + pl.getName());
                     }));
                 }
-                playlistsSection.setCards(playlistCards);
+                sectionsBox.getChildren().add(playlistsBox);
 
                 for (String genre : genres) {
-                    HorizontalCarousel gs = new HorizontalCarousel(genre, new ArrayList<>(), 4);
+                    addSectionTitle(genre);
+                    HorizontalCarousel gs = new HorizontalCarousel("", new ArrayList<>(), 4);
                     sectionsBox.getChildren().add(gs);
                     String g = genre;
                     new Thread(() -> {
@@ -87,5 +96,12 @@ public class HomeScreen extends VBox {
                 }
             });
         }).start();
+    }
+
+    private void addSectionTitle(String text) {
+        Label lbl = new Label(text);
+        lbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 24px; -fx-font-weight: bold;");
+        lbl.setPadding(new Insets(8, 0, 0, 0));
+        sectionsBox.getChildren().add(lbl);
     }
 }

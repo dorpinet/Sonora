@@ -17,8 +17,8 @@ public class Theme {
     public static Color cardBg()     { return darkMode ? Color.web("rgba(255,255,255,0.08)") : Color.web("rgba(255,255,255,0.3)"); }
     public static Color cardBorder() { return darkMode ? Color.web("rgba(255,255,255,0.15)") : Color.web("rgba(255,255,255,0.5)"); }
     public static Color accent()     { return darkMode ? Color.web("#9B8CFF") : Color.web("#6C5CE7"); }
-    public static Color textPrimary(){ return darkMode ? Color.web("#F0F0F0") : Color.web("#2D3436"); }
-    public static Color textSecondary(){ return darkMode ? Color.web("#B0B0B0") : Color.web("#636E72"); }
+    public static Color textPrimary(){ return darkMode ? Color.web("#F0F0F0") : Color.web("#000000"); }
+    public static Color textSecondary(){ return darkMode ? Color.web("#B0B0B0") : Color.web("#333333"); }
     public static Color topBarBg()   { return darkMode ? Color.web("#3D2B8A") : Color.web("#8B7BFF"); }
     public static Color detailsBg()  { return darkMode ? Color.web("rgba(60,40,120,0.5)") : Color.web("rgba(140,130,230,0.4)"); }
     public static Color btnBg()      { return darkMode ? Color.web("rgba(255,255,255,0.12)") : Color.web("rgba(255,255,255,0.25)"); }

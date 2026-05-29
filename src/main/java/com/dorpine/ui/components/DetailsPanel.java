@@ -142,7 +142,7 @@ public class DetailsPanel extends VBox {
     private Button btn(String text) {
         Button b = new Button(text);
         b.setPrefWidth(180); b.setPrefHeight(40);
-        style(b, "-fx-background-color: " + Theme.toCss(Theme.btnBg()), "-fx-text-fill: #FFFFFF",
+        style(b, "-fx-background-color: " + Theme.toCss(Theme.btnBg()), "-fx-text-fill: " + Theme.toCss(Theme.textPrimary()),
               "-fx-font-size: 14px", "-fx-font-weight: bold", "-fx-background-radius: 24px",
               "-fx-border-color: " + Theme.toCss(Theme.btnBorder()), "-fx-border-radius: 24px", "-fx-border-width: 1px", "-fx-cursor: hand");
         b.setOnMouseEntered(e -> b.setStyle(b.getStyle().replace(Theme.toCss(Theme.btnBg()), "rgba(255,255,255,0.4)")));

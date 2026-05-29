@@ -24,30 +24,28 @@ public class HorizontalCarousel extends StackPane {
     public HorizontalCarousel(String title, List<TrackCard> cards, int visibleCount) {
         this.visibleCount = visibleCount;
 
-        VBox container = new VBox(12);
+        VBox container = new VBox(16);
         container.setAlignment(Pos.CENTER);
-
-        Label lbl = new Label(title);
-        lbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 20px; -fx-font-weight: bold;");
-        lbl.setAlignment(Pos.CENTER);
 
         HBox carousel = new HBox();
         carousel.setAlignment(Pos.CENTER);
-        carousel.setSpacing(12);
+        carousel.setSpacing(16);
 
         Button leftBtn = arrow(true);
         Button rightBtn = arrow(false);
 
-        contentBox = new HBox(12);
+        contentBox = new HBox(16);
         contentBox.setAlignment(Pos.CENTER);
         contentBox.setPadding(new Insets(8));
 
-        Region leftSpacer = new Region(); leftSpacer.setPrefWidth(40);
-        Region rightSpacer = new Region(); rightSpacer.setPrefWidth(40);
+        Region leftSpacer = new Region();
+        leftSpacer.setPrefWidth(40);
+        Region rightSpacer = new Region();
+        rightSpacer.setPrefWidth(40);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
 
         carousel.getChildren().addAll(leftBtn, leftSpacer, contentBox, rightSpacer, rightBtn);
-        container.getChildren().addAll(lbl, carousel);
+        container.getChildren().addAll(carousel);
         getChildren().add(container);
         setAlignment(Pos.CENTER);
 
@@ -63,7 +61,9 @@ public class HorizontalCarousel extends StackPane {
         Polygon p = new Polygon();
         if (left) p.getPoints().addAll(12.0, 0.0, 0.0, 12.0, 12.0, 24.0);
         else p.getPoints().addAll(0.0, 0.0, 12.0, 12.0, 0.0, 24.0);
-        p.setFill(Theme.textPrimary()); p.setStroke(Theme.textPrimary()); p.setStrokeWidth(2);
+        p.setFill(Theme.textPrimary());
+        p.setStroke(Theme.textPrimary());
+        p.setStrokeWidth(2);
         b.setGraphic(p);
         return b;
     }
@@ -76,7 +76,8 @@ public class HorizontalCarousel extends StackPane {
         for (int i = 0; i < contentBox.getChildren().size(); i++) {
             Node n = contentBox.getChildren().get(i);
             boolean vis = i >= currentIndex && i < currentIndex + visibleCount;
-            n.setVisible(vis); n.setManaged(vis);
+            n.setVisible(vis);
+            n.setManaged(vis);
         }
     }
 

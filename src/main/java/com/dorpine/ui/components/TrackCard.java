@@ -36,7 +36,7 @@ public class TrackCard extends StackPane {
 
     private void build(String cover, String title, String artist) {
         setAlignment(Pos.TOP_CENTER);
-        setPadding(new Insets(8));
+        setPadding(new Insets(10));
         String baseStyle = String.join(";",
             "-fx-background-color: " + Theme.toCss(Theme.cardBg()),
             "-fx-background-radius: 16px",
@@ -47,33 +47,51 @@ public class TrackCard extends StackPane {
         );
         setStyle(baseStyle);
 
-        DropShadow shadow = new DropShadow(); shadow.setColor(Color.web("rgba(0,0,0,0.1)")); shadow.setRadius(8); shadow.setOffsetY(2);
+        DropShadow shadow = new DropShadow();
+        shadow.setColor(Color.web("rgba(0,0,0,0.08)"));
+        shadow.setRadius(12);
+        shadow.setOffsetY(4);
         setEffect(shadow);
 
-        VBox content = new VBox(6);
+        VBox content = new VBox(8);
         content.setAlignment(Pos.TOP_CENTER);
-        content.setPadding(new Insets(6));
+        content.setPadding(new Insets(8));
 
         StackPane imgPane = new StackPane();
-        imgPane.setPrefSize(120, 120); imgPane.setMinSize(120, 120); imgPane.setMaxSize(120, 120);
+        imgPane.setPrefSize(140, 140);
+        imgPane.setMinSize(140, 140);
+        imgPane.setMaxSize(140, 140);
 
         if (cover != null && !cover.isEmpty()) {
             try {
-                Image img = new Image(cover, 120, 120, true, true, true);
+                Image img = new Image(cover, 140, 140, true, true, true);
                 ImageView iv = new ImageView(img);
-                iv.setFitWidth(120); iv.setFitHeight(120); iv.setPreserveRatio(true);
-                Rectangle clip = new Rectangle(120, 120); clip.setArcWidth(12); clip.setArcHeight(12);
-                iv.setClip(clip); imgPane.getChildren().add(iv);
-            } catch (Exception e) { imgPane.getChildren().add(placeholder(title)); }
-        } else { imgPane.getChildren().add(placeholder(title)); }
+                iv.setFitWidth(140);
+                iv.setFitHeight(140);
+                iv.setPreserveRatio(true);
+                Rectangle clip = new Rectangle(140, 140);
+                clip.setArcWidth(14);
+                clip.setArcHeight(14);
+                iv.setClip(clip);
+                imgPane.getChildren().add(iv);
+            } catch (Exception e) {
+                imgPane.getChildren().add(placeholder(title));
+            }
+        } else {
+            imgPane.getChildren().add(placeholder(title));
+        }
 
         Label titleLbl = new Label(title != null ? title : "Unknown");
-        titleLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 13px; -fx-font-weight: bold;");
-        titleLbl.setWrapText(true); titleLbl.setMaxWidth(120); titleLbl.setAlignment(Pos.CENTER);
+        titleLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 14px; -fx-font-weight: bold;");
+        titleLbl.setWrapText(true);
+        titleLbl.setMaxWidth(140);
+        titleLbl.setAlignment(Pos.CENTER);
 
         Label artistLbl = new Label(artist != null && !artist.isEmpty() ? artist : " ");
-        artistLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + "; -fx-font-size: 11px;");
-        artistLbl.setWrapText(true); artistLbl.setMaxWidth(120); artistLbl.setAlignment(Pos.CENTER);
+        artistLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + "; -fx-font-size: 12px;");
+        artistLbl.setWrapText(true);
+        artistLbl.setMaxWidth(140);
+        artistLbl.setAlignment(Pos.CENTER);
 
         content.getChildren().addAll(imgPane, titleLbl, artistLbl);
         getChildren().add(content);
@@ -86,12 +104,11 @@ public class TrackCard extends StackPane {
 
     private StackPane placeholder(String title) {
         StackPane p = new StackPane();
-        p.setPrefSize(120, 120);
-        p.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.5)")) + "; -fx-background-radius: 12px;");
+        p.setPrefSize(140, 140);
+        p.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.5)")) + "; -fx-background-radius: 14px;");
         Label l = new Label(title != null && !title.isEmpty() ? title.substring(0, 1).toUpperCase() : "?");
-        l.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + "; -fx-font-size: 32px; -fx-font-weight: bold;");
+        l.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + "; -fx-font-size: 36px; -fx-font-weight: bold;");
         p.getChildren().add(l);
         return p;
     }
-
 }

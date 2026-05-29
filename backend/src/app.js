@@ -19,6 +19,8 @@ const favoriteRoutes = require('./routes/favoriteRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.set('trust proxy', 1);
+
 connectDB();
 
 app.use(helmet());
