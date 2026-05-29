@@ -5,6 +5,7 @@ import com.dorpine.util.Theme;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -29,37 +30,49 @@ public class TopBar extends HBox {
 
     private void build() {
         setAlignment(Pos.CENTER);
-        setSpacing(20);
-        setPadding(new Insets(16, 32, 16, 32));
+        setSpacing(16);
+        setPadding(new Insets(8, 20, 8, 20));
+
+        String glassBg = Theme.isDark()
+            ? "rgba(20,20,30,0.6)"
+            : "rgba(255,255,255,0.55)";
+        String glassBorder = Theme.isDark()
+            ? "rgba(255,255,255,0.12)"
+            : "rgba(255,255,255,0.8)";
+
         setStyle(String.join(";",
-            "-fx-background-radius: 32px",
-            "-fx-background-color: " + Theme.toCss(Theme.topBarBg())
+            "-fx-background-radius: 24px",
+            "-fx-background-color: " + glassBg,
+            "-fx-border-color: " + glassBorder,
+            "-fx-border-radius: 24px",
+            "-fx-border-width: 1px"
         ));
 
+        GaussianBlur blur = new GaussianBlur(0);
+        blur.setRadius(12);
+        setEffect(blur);
+
         StackPane logoPane = new StackPane();
-        logoPane.setPrefSize(36, 36);
+        logoPane.setPrefSize(28, 28);
         ImageView logo = new ImageView();
         try {
             Image img = new Image(getClass().getResourceAsStream("/images/logo.png"));
             logo.setImage(img);
-        } catch (Exception e) {
-            System.err.println("[TopBar] Logo load failed: " + e.getMessage());
-        }
-        logo.setFitWidth(36);
-        logo.setFitHeight(36);
+        } catch (Exception e) {}
+        logo.setFitWidth(28);
+        logo.setFitHeight(28);
         logo.setPreserveRatio(true);
-        Rectangle clip = new Rectangle(36, 36);
-        clip.setArcWidth(10);
-        clip.setArcHeight(10);
+        Rectangle clip = new Rectangle(28, 28);
+        clip.setArcWidth(8);
+        clip.setArcHeight(8);
         logo.setClip(clip);
         logoPane.getChildren().add(logo);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox navBox = new HBox(28);
+        HBox navBox = new HBox(20);
         navBox.setAlignment(Pos.CENTER);
-
         navBox.getChildren().addAll(
             navBtn("Home", true),
             navBtn("Settings", false),
@@ -70,18 +83,18 @@ public class TopBar extends HBox {
         HBox.setHgrow(spacer2, Priority.ALWAYS);
 
         StackPane toggle = new StackPane();
-        toggle.setPrefWidth(48);
-        toggle.setPrefHeight(26);
-        toggle.setMaxWidth(48);
-        toggle.setMaxHeight(26);
+        toggle.setPrefWidth(44);
+        toggle.setPrefHeight(24);
+        toggle.setMaxWidth(44);
+        toggle.setMaxHeight(24);
         toggle.setStyle(String.join(";",
-            "-fx-background-radius: 13px",
+            "-fx-background-radius: 12px",
             "-fx-background-color: " + (Theme.isDark() ? "#6C5CE7" : "#2D3436"),
             "-fx-cursor: hand"
         ));
 
-        Circle thumb = new Circle(10, Color.WHITE);
-        thumb.setTranslateX(Theme.isDark() ? 10 : -10);
+        Circle thumb = new Circle(9, Color.WHITE);
+        thumb.setTranslateX(Theme.isDark() ? 9 : -9);
         toggle.getChildren().add(thumb);
 
         toggle.setOnMouseClicked(e -> {
@@ -94,7 +107,7 @@ public class TopBar extends HBox {
     private Label navBtn(String text, boolean active) {
         String color = Theme.isDark() ? (active ? "#FFFFFF" : "rgba(255,255,255,0.65)") : "#000000";
         Label l = new Label(text);
-        l.setFont(Fonts.body(15));
+        l.setFont(Fonts.body(14));
         l.setStyle(String.join(";",
             "-fx-text-fill: " + color,
             "-fx-font-weight: " + (active ? "bold" : "normal"),

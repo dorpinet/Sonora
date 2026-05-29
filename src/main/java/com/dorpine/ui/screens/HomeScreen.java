@@ -32,11 +32,11 @@ public class HomeScreen extends VBox {
         this.toggleTheme = toggleTheme;
         setSpacing(0);
         setFillWidth(true);
-        setPadding(new Insets(24, 0, 40, 0));
+        setPadding(new Insets(16, 0, 40, 0));
 
-        sectionsBox = new VBox(40);
+        sectionsBox = new VBox(32);
         sectionsBox.setFillWidth(true);
-        sectionsBox.setPadding(new Insets(0, 24, 0, 24));
+        sectionsBox.setPadding(new Insets(0, 20, 0, 20));
         sectionsBox.setAlignment(Pos.TOP_CENTER);
 
         sectionsBox.getChildren().add(new TopBar(s -> {
@@ -73,7 +73,7 @@ public class HomeScreen extends VBox {
                 }
 
                 addSectionTitle("My playlists");
-                HBox playlistsBox = new HBox(20);
+                HBox playlistsBox = new HBox(16);
                 playlistsBox.setAlignment(Pos.CENTER);
                 for (Playlist p : stubPlaylists) {
                     playlistsBox.getChildren().add(new TrackCard(p, item -> {
@@ -102,9 +102,9 @@ public class HomeScreen extends VBox {
 
     private void addSectionTitle(String text) {
         Label lbl = new Label(text);
-        lbl.setFont(Fonts.heading(24));
+        lbl.setFont(Fonts.heading(22));
         lbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
-        lbl.setPadding(new Insets(8, 0, 0, 0));
+        lbl.setPadding(new Insets(4, 0, 0, 0));
         lbl.setAlignment(Pos.CENTER);
         lbl.setMaxWidth(Double.MAX_VALUE);
         sectionsBox.getChildren().add(lbl);
