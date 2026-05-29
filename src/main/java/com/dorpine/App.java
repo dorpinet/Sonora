@@ -42,8 +42,8 @@ public class App extends Application {
         HBox mainBox = new HBox();
 
         VBox leftPanel = new VBox();
-        leftPanel.setSpacing(12);
-        leftPanel.setPadding(new Insets(16, 0, 0, 0));
+        leftPanel.setSpacing(16);
+        leftPanel.setPadding(new Insets(20, 20, 0, 20));
         HBox.setHgrow(leftPanel, Priority.ALWAYS);
 
         TopBar topBar = new TopBar(this::navigateTo, () -> Platform.runLater(this::toggleTheme));
