@@ -37,6 +37,7 @@ public class HomeScreen extends VBox {
         sectionsBox = new VBox(40);
         sectionsBox.setFillWidth(true);
         sectionsBox.setPadding(new Insets(0, 24, 0, 24));
+        sectionsBox.setAlignment(Pos.TOP_CENTER);
 
         sectionsBox.getChildren().add(new TopBar(s -> {
             if (!s.equals("home")) navHandler.accept(s);
@@ -63,7 +64,7 @@ public class HomeScreen extends VBox {
                 }, toggleTheme));
 
                 addSectionTitle("Sheet notes");
-                HorizontalCarousel notesSection = new HorizontalCarousel("", new ArrayList<>(), 3);
+                HorizontalCarousel notesSection = new HorizontalCarousel("", new ArrayList<>(), 5);
                 sectionsBox.getChildren().add(notesSection);
                 if (!notes.isEmpty()) {
                     List<TrackCard> noteCards = new ArrayList<>();
@@ -83,7 +84,7 @@ public class HomeScreen extends VBox {
 
                 for (String genre : genres) {
                     addSectionTitle(genre);
-                    HorizontalCarousel gs = new HorizontalCarousel("", new ArrayList<>(), 4);
+                    HorizontalCarousel gs = new HorizontalCarousel("", new ArrayList<>(), 5);
                     sectionsBox.getChildren().add(gs);
                     String g = genre;
                     new Thread(() -> {
@@ -104,6 +105,8 @@ public class HomeScreen extends VBox {
         lbl.setFont(Fonts.heading(24));
         lbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         lbl.setPadding(new Insets(8, 0, 0, 0));
+        lbl.setAlignment(Pos.CENTER);
+        lbl.setMaxWidth(Double.MAX_VALUE);
         sectionsBox.getChildren().add(lbl);
     }
 }

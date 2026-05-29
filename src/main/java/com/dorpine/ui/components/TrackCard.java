@@ -59,18 +59,18 @@ public class TrackCard extends StackPane {
         content.setPadding(new Insets(8));
 
         StackPane imgPane = new StackPane();
-        imgPane.setPrefSize(140, 140);
-        imgPane.setMinSize(140, 140);
-        imgPane.setMaxSize(140, 140);
+        imgPane.setPrefSize(150, 150);
+        imgPane.setMinSize(150, 150);
+        imgPane.setMaxSize(150, 150);
 
         if (cover != null && !cover.isEmpty()) {
             try {
-                Image img = new Image(cover, 140, 140, true, true, true);
+                Image img = new Image(cover, 150, 150, true, true, true);
                 ImageView iv = new ImageView(img);
-                iv.setFitWidth(140);
-                iv.setFitHeight(140);
+                iv.setFitWidth(150);
+                iv.setFitHeight(150);
                 iv.setPreserveRatio(true);
-                Rectangle clip = new Rectangle(140, 140);
+                Rectangle clip = new Rectangle(150, 150);
                 clip.setArcWidth(14);
                 clip.setArcHeight(14);
                 iv.setClip(clip);
@@ -86,14 +86,14 @@ public class TrackCard extends StackPane {
         titleLbl.setFont(Fonts.heading(14));
         titleLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         titleLbl.setWrapText(true);
-        titleLbl.setMaxWidth(140);
+        titleLbl.setMaxWidth(150);
         titleLbl.setAlignment(Pos.CENTER);
 
         Label artistLbl = new Label(artist != null && !artist.isEmpty() ? artist : " ");
         artistLbl.setFont(Fonts.body(12));
         artistLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
         artistLbl.setWrapText(true);
-        artistLbl.setMaxWidth(140);
+        artistLbl.setMaxWidth(150);
         artistLbl.setAlignment(Pos.CENTER);
 
         content.getChildren().addAll(imgPane, titleLbl, artistLbl);
@@ -107,7 +107,7 @@ public class TrackCard extends StackPane {
 
     private StackPane placeholder(String title) {
         StackPane p = new StackPane();
-        p.setPrefSize(140, 140);
+        p.setPrefSize(150, 150);
         p.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.5)")) + "; -fx-background-radius: 14px;");
         Label l = new Label(title != null && !title.isEmpty() ? title.substring(0, 1).toUpperCase() : "?");
         l.setFont(Fonts.heading(36));

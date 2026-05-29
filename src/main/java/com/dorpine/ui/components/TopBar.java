@@ -13,6 +13,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
 import java.util.function.Consumer;
 
@@ -29,27 +30,34 @@ public class TopBar extends HBox {
     private void build() {
         setAlignment(Pos.CENTER);
         setSpacing(20);
-        setPadding(new Insets(14, 28, 14, 28));
+        setPadding(new Insets(16, 32, 16, 32));
         setStyle(String.join(";",
-            "-fx-background-radius: 28px",
+            "-fx-background-radius: 32px",
             "-fx-background-color: " + Theme.toCss(Theme.topBarBg())
         ));
 
+        StackPane logoPane = new StackPane();
+        logoPane.setPrefSize(36, 36);
         ImageView logo = new ImageView();
         try {
             Image img = new Image(getClass().getResourceAsStream("/images/logo.png"));
             logo.setImage(img);
         } catch (Exception e) {
-            System.err.println("[TopBar] Failed to load logo: " + e.getMessage());
+            System.err.println("[TopBar] Logo load failed: " + e.getMessage());
         }
-        logo.setFitWidth(32);
-        logo.setFitHeight(32);
+        logo.setFitWidth(36);
+        logo.setFitHeight(36);
         logo.setPreserveRatio(true);
+        Rectangle clip = new Rectangle(36, 36);
+        clip.setArcWidth(10);
+        clip.setArcHeight(10);
+        logo.setClip(clip);
+        logoPane.getChildren().add(logo);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox navBox = new HBox(24);
+        HBox navBox = new HBox(28);
         navBox.setAlignment(Pos.CENTER);
 
         navBox.getChildren().addAll(
@@ -80,7 +88,7 @@ public class TopBar extends HBox {
             if (themeToggleHandler != null) themeToggleHandler.run();
         });
 
-        getChildren().addAll(logo, spacer, navBox, spacer2, toggle);
+        getChildren().addAll(logoPane, spacer, navBox, spacer2, toggle);
     }
 
     private Label navBtn(String text, boolean active) {

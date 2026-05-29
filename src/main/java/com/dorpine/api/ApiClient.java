@@ -3,6 +3,7 @@ package com.dorpine.api;
 import com.dorpine.model.Note;
 import com.dorpine.model.Playlist;
 import com.dorpine.model.Track;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,23 +19,24 @@ import java.util.List;
 public class ApiClient {
     private static final String BASE_URL = System.getProperty("api.url", "https://sonora-rdg0.onrender.com/api");
     private static final HttpClient CLIENT = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(10))
+            .version(HttpClient.Version.HTTP_1_1)
+            .connectTimeout(Duration.ofSeconds(15))
             .build();
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private ApiClient() {}
 
     public static List<Track> getTracks(String genre) {
         try {
             String url = BASE_URL + "/tracks" + (genre != null && !genre.isEmpty() ? "?genre=" + genre : "");
-            System.out.println("[API] GET " + url);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
                     .GET()
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("[API] Response " + response.statusCode() + ": " + response.body().substring(0, Math.min(200, response.body().length())));
             if (response.statusCode() == 200) {
                 JsonNode root = MAPPER.readTree(response.body());
                 JsonNode tracksNode = root.get("tracks");
@@ -44,31 +46,29 @@ public class ApiClient {
                         try {
                             tracks.add(MAPPER.treeToValue(node, Track.class));
                         } catch (Exception ex) {
-                            System.err.println("[API] Failed to parse track: " + ex.getMessage());
+                            System.err.println("[API] Parse track error: " + ex.getMessage());
                         }
                     }
-                    System.out.println("[API] Parsed " + tracks.size() + " tracks");
                     return tracks;
                 }
+            } else {
+                System.err.println("[API] Tracks HTTP " + response.statusCode());
             }
         } catch (Exception e) {
-            System.err.println("[API] Failed to fetch tracks: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[API] Fetch tracks error: " + e.getMessage());
         }
         return Collections.emptyList();
     }
 
     public static List<Note> getNotes() {
         try {
-            String url = BASE_URL + "/notes";
-            System.out.println("[API] GET " + url);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
+                    .uri(URI.create(BASE_URL + "/notes"))
                     .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
                     .GET()
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("[API] Response " + response.statusCode() + ": " + response.body().substring(0, Math.min(200, response.body().length())));
             if (response.statusCode() == 200) {
                 JsonNode root = MAPPER.readTree(response.body());
                 JsonNode notesNode = root.get("notes");
@@ -78,69 +78,42 @@ public class ApiClient {
                         try {
                             notes.add(MAPPER.treeToValue(node, Note.class));
                         } catch (Exception ex) {
-                            System.err.println("[API] Failed to parse note: " + ex.getMessage());
+                            System.err.println("[API] Parse note error: " + ex.getMessage());
                         }
                     }
-                    System.out.println("[API] Parsed " + notes.size() + " notes");
                     return notes;
                 }
+            } else {
+                System.err.println("[API] Notes HTTP " + response.statusCode());
             }
         } catch (Exception e) {
-            System.err.println("[API] Failed to fetch notes: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[API] Fetch notes error: " + e.getMessage());
         }
         return Collections.emptyList();
     }
 
     public static List<String> getGenres() {
         try {
-            String url = BASE_URL + "/tracks/genres";
-            System.out.println("[API] GET " + url);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
+                    .uri(URI.create(BASE_URL + "/tracks/genres"))
                     .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
                     .GET()
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("[API] Response " + response.statusCode() + ": " + response.body().substring(0, Math.min(200, response.body().length())));
             if (response.statusCode() == 200) {
                 JsonNode root = MAPPER.readTree(response.body());
                 JsonNode genresNode = root.get("genres");
                 if (genresNode != null && genresNode.isArray()) {
                     List<String> genres = new ArrayList<>();
                     for (JsonNode g : genresNode) genres.add(g.asText());
-                    System.out.println("[API] Parsed " + genres.size() + " genres");
                     return genres;
                 }
+            } else {
+                System.err.println("[API] Genres HTTP " + response.statusCode());
             }
         } catch (Exception e) {
-            System.err.println("[API] Failed to fetch genres: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
-    }
-
-    public static List<Playlist> getPlaylists() {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/playlists"))
-                    .header("Accept", "application/json")
-                    .GET()
-                    .build();
-            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                JsonNode root = MAPPER.readTree(response.body());
-                JsonNode playlistsNode = root.get("playlists");
-                if (playlistsNode != null && playlistsNode.isArray()) {
-                    List<Playlist> playlists = new ArrayList<>();
-                    for (JsonNode node : playlistsNode) {
-                        playlists.add(MAPPER.treeToValue(node, Playlist.class));
-                    }
-                    return playlists;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("[API] Failed to fetch playlists: " + e.getMessage());
+            System.err.println("[API] Fetch genres error: " + e.getMessage());
         }
         return Collections.emptyList();
     }
@@ -150,6 +123,7 @@ public class ApiClient {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/spotify/preview/" + spotifyId))
                     .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
                     .GET()
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -161,21 +135,8 @@ public class ApiClient {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[API] Failed to fetch preview: " + e.getMessage());
+            System.err.println("[API] Preview error: " + e.getMessage());
         }
         return null;
-    }
-
-    public static boolean isHealthy() {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL.replace("/api", "") + "/health"))
-                    .GET()
-                    .build();
-            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.statusCode() == 200;
-        } catch (Exception e) {
-            return false;
-        }
     }
 }
