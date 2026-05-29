@@ -6,6 +6,7 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Playlist {
+    @com.fasterxml.jackson.annotation.JsonProperty("_id")
     private String id;
     private String name;
     private String description;

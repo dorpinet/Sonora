@@ -3,77 +3,82 @@ package com.dorpine;
 import com.dorpine.model.Note;
 import com.dorpine.model.Track;
 import com.dorpine.ui.components.DetailsPanel;
-import com.dorpine.ui.components.TopBar;
 import com.dorpine.ui.screens.*;
 import com.dorpine.util.Theme;
 import javafx.application.Application;
-import javafx.geometry.Insets;
+import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class App extends Application {
     private StackPane root;
     private DetailsPanel detailsPanel;
-    private HomeScreen homeScreen;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage stage) {
         root = new StackPane();
-        root.setStyle("-fx-background-color: " + toHex(Theme.BACKGROUND_START) + ";");
-
+        root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
         showHome();
-
         Scene scene = new Scene(root, 1200, 800);
-        primaryStage.setTitle("SONORA");
-        primaryStage.setScene(scene);
-        primaryStage.setMinWidth(900);
-        primaryStage.setMinHeight(600);
-        primaryStage.show();
+        stage.setTitle("SONORA");
+        stage.setScene(scene);
+        stage.setMinWidth(900);
+        stage.setMinHeight(600);
+        stage.show();
     }
 
     private void showHome() {
-        BorderPane homeRoot = new BorderPane();
-        homeRoot.setStyle("-fx-background-color: " + toHex(Theme.BACKGROUND_START) + ";");
+        root.getChildren().clear();
 
-        TopBar topBar = new TopBar(this::navigateTo);
-        homeRoot.setTop(topBar);
-        BorderPane.setMargin(topBar, new Insets(16, 24, 8, 24));
+        HBox mainBox = new HBox();
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        scrollPane.setPrefWidth(800);
+        HBox.setHgrow(scrollPane, Priority.ALWAYS);
 
         detailsPanel = new DetailsPanel(this::navigateTo);
-        homeScreen = new HomeScreen(this::navigateTo, this::showDetails);
 
-        homeRoot.setCenter(homeScreen);
-        homeRoot.setRight(detailsPanel);
-        BorderPane.setMargin(detailsPanel, new Insets(0, 24, 16, 0));
+        scrollPane.setContent(new HomeScreen(this::navigateTo, this::showDetails, () -> {
+            Platform.runLater(this::toggleTheme);
+        }));
 
-        root.getChildren().clear();
-        root.getChildren().add(homeRoot);
+        mainBox.getChildren().addAll(scrollPane, detailsPanel);
+        root.getChildren().add(mainBox);
+    }
+
+    private void toggleTheme() {
+        Theme.toggle();
+        root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
+        showHome();
     }
 
     private void showDetails(Object item) {
-        if (detailsPanel == null) return;
-        if (item instanceof Track) {
-            Track track = (Track) item;
-            detailsPanel.showTrack(track);
-            String spotifyId = track.getSpotifyId();
-            if (spotifyId != null && !spotifyId.isEmpty()) {
+        if (item instanceof Track t) {
+            detailsPanel.showTrack(t);
+            String sid = t.getSpotifyId();
+            if (sid != null && !sid.isEmpty()) {
                 new Thread(() -> {
-                    String previewUrl = com.dorpine.api.ApiClient.getPreviewUrl(spotifyId);
-                    javafx.application.Platform.runLater(() -> detailsPanel.setPreviewUrl(previewUrl));
+                    String url = com.dorpine.api.ApiClient.getPreviewUrl(sid);
+                    Platform.runLater(() -> detailsPanel.setPreviewUrl(url));
                 }).start();
             } else {
                 detailsPanel.setPreviewUrl(null);
             }
-        } else if (item instanceof Note) {
-            Note note = (Note) item;
-            detailsPanel.showNote(note);
-            String spotifyId = note.getSpotifyId();
-            if (spotifyId != null && !spotifyId.isEmpty()) {
+        } else if (item instanceof Note n) {
+            detailsPanel.showNote(n);
+            String sid = n.getSpotifyId();
+            if (sid != null && !sid.isEmpty()) {
                 new Thread(() -> {
-                    String previewUrl = com.dorpine.api.ApiClient.getPreviewUrl(spotifyId);
-                    javafx.application.Platform.runLater(() -> detailsPanel.setPreviewUrl(previewUrl));
+                    String url = com.dorpine.api.ApiClient.getPreviewUrl(sid);
+                    Platform.runLater(() -> detailsPanel.setPreviewUrl(url));
                 }).start();
             } else {
                 detailsPanel.setPreviewUrl(null);
@@ -82,39 +87,18 @@ public class App extends Application {
     }
 
     private void navigateTo(String screen) {
-        if (screen.equals("home")) {
-            showHome();
-            return;
-        }
-
-        if (screen.startsWith("playlist:")) {
-            String playlistName = screen.substring("playlist:".length());
-            root.getChildren().clear();
-            root.getChildren().add(new PlaylistDetailScreen(playlistName, this::navigateTo));
-            return;
-        }
-
+        if (screen.equals("home")) { showHome(); return; }
         root.getChildren().clear();
         switch (screen) {
-            case "settings":
-                root.getChildren().add(new SettingsScreen(this::navigateTo));
-                break;
-            case "theory":
-                root.getChildren().add(new TheoryScreen(this::navigateTo));
-                break;
-            case "piano":
-                root.getChildren().add(new PianoScreen(this::navigateTo));
-                break;
-            default:
-                showHome();
+            case "settings" -> root.getChildren().add(new SettingsScreen(this::navigateTo));
+            case "theory"   -> root.getChildren().add(new TheoryScreen(this::navigateTo));
+            case "piano"    -> root.getChildren().add(new PianoScreen(this::navigateTo));
+            default -> {
+                if (screen.startsWith("playlist:")) {
+                    root.getChildren().add(new PlaylistDetailScreen(screen.substring("playlist:".length()), this::navigateTo));
+                } else { showHome(); }
+            }
         }
-    }
-
-    private static String toHex(javafx.scene.paint.Color color) {
-        return String.format("#%02X%02X%02X",
-            (int) (color.getRed() * 255),
-            (int) (color.getGreen() * 255),
-            (int) (color.getBlue() * 255));
     }
 
     public static void main(String[] args) {

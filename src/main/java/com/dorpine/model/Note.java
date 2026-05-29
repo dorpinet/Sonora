@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Note {
+    @com.fasterxml.jackson.annotation.JsonProperty("_id")
     private String id;
     private String title;
     private String artist;

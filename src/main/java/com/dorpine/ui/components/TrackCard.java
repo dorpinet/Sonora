@@ -19,130 +19,79 @@ import java.util.function.Consumer;
 
 public class TrackCard extends StackPane {
     private final Object item;
-    private final Consumer<Object> clickHandler;
+    private final Consumer<Object> handler;
 
-    public TrackCard(Track track, Consumer<Object> clickHandler) {
-        this.item = track;
-        this.clickHandler = clickHandler;
-        build(track.getCoverUrl(), track.getTitle(), track.getArtist());
+    public TrackCard(Track t, Consumer<Object> handler) { this.item = t; this.handler = handler; build(t.getCoverUrl(), t.getTitle(), t.getArtist()); }
+    public TrackCard(Note n, Consumer<Object> handler) { this.item = n; this.handler = handler; build(n.getCoverUrl() != null ? n.getCoverUrl() : n.getImageUrl(), n.getTitle(), n.getArtist()); }
+    public TrackCard(Playlist p, Consumer<Object> handler) {
+        this.item = p; this.handler = handler;
+        String cover = p.getCoverUrl();
+        if (cover == null && p.getTracks() != null && !p.getTracks().isEmpty()) cover = p.getTracks().get(0).getCoverUrl();
+        build(cover, p.getName(), p.getDescription());
     }
 
-    public TrackCard(Note note, Consumer<Object> clickHandler) {
-        this.item = note;
-        this.clickHandler = clickHandler;
-        build(note.getCoverUrl() != null ? note.getCoverUrl() : note.getImageUrl(), note.getTitle(), note.getArtist());
+    public TrackCard(String title, String subtitle, String cover, Consumer<Object> handler) {
+        this.item = null; this.handler = handler; build(cover, title, subtitle);
     }
 
-    public TrackCard(Playlist playlist, Consumer<Object> clickHandler) {
-        this.item = playlist;
-        this.clickHandler = clickHandler;
-        String cover = playlist.getCoverUrl();
-        if (cover == null && playlist.getTracks() != null && !playlist.getTracks().isEmpty()) {
-            cover = playlist.getTracks().get(0).getCoverUrl();
-        }
-        build(cover, playlist.getName(), playlist.getDescription());
-    }
-
-    public TrackCard(String title, String subtitle, String coverUrl, Consumer<Object> clickHandler) {
-        this.item = null;
-        this.clickHandler = clickHandler;
-        build(coverUrl, title, subtitle);
-    }
-
-    private void build(String coverUrl, String title, String artist) {
+    private void build(String cover, String title, String artist) {
         setAlignment(Pos.TOP_CENTER);
         setPadding(new Insets(8));
-        setStyle(
-            "-fx-background-color: " + toHex(Theme.CARD_BG) + ";" +
-            "-fx-background-radius: " + Theme.CARD_RADIUS + ";" +
-            "-fx-border-color: " + toHex(Theme.CARD_BORDER) + ";" +
-            "-fx-border-radius: " + Theme.CARD_RADIUS + ";" +
-            "-fx-border-width: 1px;" +
-            "-fx-cursor: hand;"
+        String baseStyle = String.join(";",
+            "-fx-background-color: " + Theme.toCss(Theme.cardBg()),
+            "-fx-background-radius: 16px",
+            "-fx-border-color: " + Theme.toCss(Theme.cardBorder()),
+            "-fx-border-radius: 16px",
+            "-fx-border-width: 1px",
+            "-fx-cursor: hand"
         );
+        setStyle(baseStyle);
 
-        DropShadow shadow = new DropShadow();
-        shadow.setColor(Color.web("rgba(0,0,0,0.1)"));
-        shadow.setRadius(8);
-        shadow.setOffsetY(2);
+        DropShadow shadow = new DropShadow(); shadow.setColor(Color.web("rgba(0,0,0,0.1)")); shadow.setRadius(8); shadow.setOffsetY(2);
         setEffect(shadow);
 
         VBox content = new VBox(6);
         content.setAlignment(Pos.TOP_CENTER);
         content.setPadding(new Insets(6));
 
-        StackPane imagePane = new StackPane();
-        imagePane.setPrefSize(120, 120);
-        imagePane.setMinSize(120, 120);
-        imagePane.setMaxSize(120, 120);
+        StackPane imgPane = new StackPane();
+        imgPane.setPrefSize(120, 120); imgPane.setMinSize(120, 120); imgPane.setMaxSize(120, 120);
 
-        if (coverUrl != null && !coverUrl.isEmpty()) {
+        if (cover != null && !cover.isEmpty()) {
             try {
-                Image image = new Image(coverUrl, 120, 120, true, true, true);
-                ImageView imageView = new ImageView(image);
-                imageView.setFitWidth(120);
-                imageView.setFitHeight(120);
-                imageView.setPreserveRatio(true);
-                Rectangle clip = new Rectangle(120, 120);
-                clip.setArcWidth(12);
-                clip.setArcHeight(12);
-                imageView.setClip(clip);
-                imagePane.getChildren().add(imageView);
-            } catch (Exception e) {
-                imagePane.getChildren().add(createPlaceholder(title));
-            }
-        } else {
-            imagePane.getChildren().add(createPlaceholder(title));
-        }
+                Image img = new Image(cover, 120, 120, true, true, true);
+                ImageView iv = new ImageView(img);
+                iv.setFitWidth(120); iv.setFitHeight(120); iv.setPreserveRatio(true);
+                Rectangle clip = new Rectangle(120, 120); clip.setArcWidth(12); clip.setArcHeight(12);
+                iv.setClip(clip); imgPane.getChildren().add(iv);
+            } catch (Exception e) { imgPane.getChildren().add(placeholder(title)); }
+        } else { imgPane.getChildren().add(placeholder(title)); }
 
-        Label titleLabel = new Label(title != null ? title : "Unknown");
-        titleLabel.setStyle("-fx-text-fill: " + toHex(Theme.TEXT_PRIMARY) + "; -fx-font-size: 13px; -fx-font-weight: bold;");
-        titleLabel.setWrapText(true);
-        titleLabel.setMaxWidth(120);
-        titleLabel.setAlignment(Pos.CENTER);
+        Label titleLbl = new Label(title != null ? title : "Unknown");
+        titleLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-font-size: 13px; -fx-font-weight: bold;");
+        titleLbl.setWrapText(true); titleLbl.setMaxWidth(120); titleLbl.setAlignment(Pos.CENTER);
 
-        Label artistLabel = new Label(artist != null && !artist.isEmpty() ? artist : " ");
-        artistLabel.setStyle("-fx-text-fill: " + toHex(Theme.TEXT_SECONDARY) + "; -fx-font-size: 11px;");
-        artistLabel.setWrapText(true);
-        artistLabel.setMaxWidth(120);
-        artistLabel.setAlignment(Pos.CENTER);
+        Label artistLbl = new Label(artist != null && !artist.isEmpty() ? artist : " ");
+        artistLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + "; -fx-font-size: 11px;");
+        artistLbl.setWrapText(true); artistLbl.setMaxWidth(120); artistLbl.setAlignment(Pos.CENTER);
 
-        content.getChildren().addAll(imagePane, titleLabel, artistLabel);
+        content.getChildren().addAll(imgPane, titleLbl, artistLbl);
         getChildren().add(content);
 
-        setOnMouseClicked(e -> {
-            if (clickHandler != null) {
-                clickHandler.accept(item);
-            }
-        });
-
-        setOnMouseEntered(e -> {
-            setStyle(getStyle().replace(toHex(Theme.CARD_BG), toHex(Color.web("rgba(255,255,255,0.5)"))));
-        });
-        setOnMouseExited(e -> {
-            setStyle(getStyle().replace(toHex(Color.web("rgba(255,255,255,0.5)")), toHex(Theme.CARD_BG)));
-        });
+        String hoverBg = Theme.toCss(Color.web("rgba(255,255,255,0.5)"));
+        setOnMouseClicked(e -> { if (handler != null) handler.accept(item); });
+        setOnMouseEntered(e -> setStyle(baseStyle + "; -fx-background-color: " + hoverBg));
+        setOnMouseExited(e -> setStyle(baseStyle));
     }
 
-    private StackPane createPlaceholder(String title) {
-        StackPane placeholder = new StackPane();
-        placeholder.setPrefSize(120, 120);
-        placeholder.setStyle("-fx-background-color: " + toHex(Color.web("rgba(200,190,255,0.5)")) + "; -fx-background-radius: 12px;");
-
-        Label label = new Label(title != null && title.length() > 0 ? title.substring(0, 1).toUpperCase() : "?");
-        label.setStyle("-fx-text-fill: " + toHex(Theme.ACCENT) + "; -fx-font-size: 32px; -fx-font-weight: bold;");
-        placeholder.getChildren().add(label);
-        return placeholder;
+    private StackPane placeholder(String title) {
+        StackPane p = new StackPane();
+        p.setPrefSize(120, 120);
+        p.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.5)")) + "; -fx-background-radius: 12px;");
+        Label l = new Label(title != null && !title.isEmpty() ? title.substring(0, 1).toUpperCase() : "?");
+        l.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + "; -fx-font-size: 32px; -fx-font-weight: bold;");
+        p.getChildren().add(l);
+        return p;
     }
 
-    private static String toHex(Color color) {
-        int r = (int) (color.getRed() * 255);
-        int g = (int) (color.getGreen() * 255);
-        int b = (int) (color.getBlue() * 255);
-        double a = color.getOpacity();
-        if (a >= 1.0) {
-            return String.format("#%02X%02X%02X", r, g, b);
-        }
-        return String.format("rgba(%d,%d,%d,%.2f)", r, g, b, a);
-    }
 }

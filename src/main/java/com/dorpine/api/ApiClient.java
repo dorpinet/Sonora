@@ -78,6 +78,31 @@ public class ApiClient {
         return Collections.emptyList();
     }
 
+    public static List<String> getGenres() {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/tracks/genres"))
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JsonNode root = MAPPER.readTree(response.body());
+                JsonNode genresNode = root.get("genres");
+                if (genresNode != null && genresNode.isArray()) {
+                    List<String> genres = new ArrayList<>();
+                    for (JsonNode g : genresNode) {
+                        genres.add(g.asText());
+                    }
+                    return genres;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to fetch genres: " + e.getMessage());
+        }
+        return Collections.emptyList();
+    }
+
     public static List<Playlist> getPlaylists() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
