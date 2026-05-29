@@ -41,7 +41,8 @@ public class App extends Application {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setPannable(true);
         scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
         scrollPane.setPrefWidth(800);
         HBox.setHgrow(scrollPane, Priority.ALWAYS);
@@ -69,6 +70,7 @@ public class App extends Application {
             if (sid != null && !sid.isEmpty()) {
                 new Thread(() -> {
                     String url = com.dorpine.api.ApiClient.getPreviewUrl(sid);
+                    System.out.println("[Details] Got preview URL: " + url);
                     Platform.runLater(() -> detailsPanel.setPreviewUrl(url));
                 }).start();
             } else {
@@ -80,6 +82,7 @@ public class App extends Application {
             if (sid != null && !sid.isEmpty()) {
                 new Thread(() -> {
                     String url = com.dorpine.api.ApiClient.getPreviewUrl(sid);
+                    System.out.println("[Details] Got preview URL: " + url);
                     Platform.runLater(() -> detailsPanel.setPreviewUrl(url));
                 }).start();
             } else {

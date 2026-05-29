@@ -33,11 +33,11 @@ public class DetailsPanel extends VBox {
     public DetailsPanel(Consumer<String> navHandler) {
         this.navHandler = navHandler;
         setAlignment(Pos.TOP_CENTER);
-        setSpacing(12);
-        setPadding(new Insets(16));
-        setPrefWidth(240);
-        setMinWidth(220);
-        setMaxWidth(260);
+        setSpacing(14);
+        setPadding(new Insets(20));
+        setPrefWidth(280);
+        setMinWidth(260);
+        setMaxWidth(300);
         style(this,
             "-fx-background-radius: 20px",
             "-fx-background-color: " + Theme.toCss(Theme.detailsBg()),
@@ -47,24 +47,24 @@ public class DetailsPanel extends VBox {
         );
 
         Label title = new Label("Details");
-        title.setFont(Fonts.heading(16));
+        title.setFont(Fonts.heading(18));
         title.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
 
         coverPane = new StackPane();
-        coverPane.setPrefSize(160, 160);
-        coverPane.setMinSize(160, 160);
-        coverPane.setMaxSize(160, 160);
-        coverPane.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.15)")) + "; -fx-background-radius: 14px;");
+        coverPane.setPrefSize(200, 200);
+        coverPane.setMinSize(200, 200);
+        coverPane.setMaxSize(200, 200);
+        coverPane.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.15)")) + "; -fx-background-radius: 16px;");
         showPlaceholder();
 
         nameLabel = new Label("Select a track");
-        nameLabel.setFont(Fonts.heading(14));
+        nameLabel.setFont(Fonts.heading(16));
         nameLabel.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         nameLabel.setWrapText(true);
         nameLabel.setAlignment(Pos.CENTER);
 
         artistLabel = new Label("");
-        artistLabel.setFont(Fonts.body(12));
+        artistLabel.setFont(Fonts.body(14));
         artistLabel.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
         artistLabel.setWrapText(true);
         artistLabel.setAlignment(Pos.CENTER);
@@ -109,6 +109,7 @@ public class DetailsPanel extends VBox {
             listenBtn.setText("No preview");
         } else {
             listenBtn.setText("Listen");
+            System.out.println("[Preview] URL set: " + url);
         }
     }
 
@@ -122,9 +123,6 @@ public class DetailsPanel extends VBox {
             listenBtn.setText("Listen");
         } else {
             play();
-            if (playing) {
-                listenBtn.setText("Pause");
-            }
         }
     }
 
@@ -134,23 +132,28 @@ public class DetailsPanel extends VBox {
                 mediaPlayer.stop();
                 mediaPlayer.dispose();
             }
+            System.out.println("[Preview] Creating MediaPlayer for: " + previewUrl);
             Media media = new Media(previewUrl);
             mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setOnReady(() -> {
+                System.out.println("[Preview] Media ready, playing...");
                 mediaPlayer.play();
                 playing = true;
+                listenBtn.setText("Pause");
             });
             mediaPlayer.setOnError(() -> {
-                System.err.println("[MediaPlayer] Error: " + mediaPlayer.getError().getMessage());
+                String err = mediaPlayer.getError() != null ? mediaPlayer.getError().getMessage() : "unknown";
+                System.err.println("[Preview] MediaPlayer error: " + err);
                 playing = false;
                 listenBtn.setText("Error");
             });
             mediaPlayer.setOnEndOfMedia(() -> {
+                System.out.println("[Preview] Track ended");
                 playing = false;
                 listenBtn.setText("Listen");
             });
         } catch (Exception e) {
-            System.err.println("[MediaPlayer] Play error: " + e.getMessage());
+            System.err.println("[Preview] Play exception: " + e.getMessage());
             listenBtn.setText("Error");
             playing = false;
         }
@@ -176,14 +179,14 @@ public class DetailsPanel extends VBox {
         coverPane.getChildren().clear();
         if (url != null && !url.isEmpty()) {
             try {
-                Image img = new Image(url, 160, 160, true, true, true);
+                Image img = new Image(url, 200, 200, true, true, true);
                 ImageView iv = new ImageView(img);
-                iv.setFitWidth(160);
-                iv.setFitHeight(160);
+                iv.setFitWidth(200);
+                iv.setFitHeight(200);
                 iv.setPreserveRatio(true);
-                Rectangle clip = new Rectangle(160, 160);
-                clip.setArcWidth(14);
-                clip.setArcHeight(14);
+                Rectangle clip = new Rectangle(200, 200);
+                clip.setArcWidth(16);
+                clip.setArcHeight(16);
                 iv.setClip(clip);
                 coverPane.getChildren().add(iv);
             } catch (Exception e) {
@@ -197,7 +200,7 @@ public class DetailsPanel extends VBox {
     private void showPlaceholder() {
         coverPane.getChildren().clear();
         Label l = new Label("\uD83C\uDFB5");
-        l.setStyle("-fx-font-size: 40px;");
+        l.setStyle("-fx-font-size: 48px;");
         coverPane.getChildren().add(l);
     }
 
@@ -213,16 +216,16 @@ public class DetailsPanel extends VBox {
 
     private Button btn(String text) {
         Button b = new Button(text);
-        b.setPrefWidth(160);
-        b.setPrefHeight(36);
+        b.setPrefWidth(180);
+        b.setPrefHeight(40);
         style(b,
             "-fx-background-color: " + Theme.toCss(Theme.btnBg()),
             "-fx-text-fill: " + Theme.toCss(Theme.textPrimary()),
-            "-fx-font-size: 13px",
+            "-fx-font-size: 14px",
             "-fx-font-weight: bold",
-            "-fx-background-radius: 20px",
+            "-fx-background-radius: 24px",
             "-fx-border-color: " + Theme.toCss(Theme.btnBorder()),
-            "-fx-border-radius: 20px",
+            "-fx-border-radius: 24px",
             "-fx-border-width: 1px",
             "-fx-cursor: hand"
         );

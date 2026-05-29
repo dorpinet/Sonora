@@ -5,7 +5,6 @@ import com.dorpine.util.Theme;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -30,27 +29,23 @@ public class TopBar extends HBox {
 
     private void build() {
         setAlignment(Pos.CENTER);
-        setSpacing(16);
-        setPadding(new Insets(8, 20, 8, 20));
+        setSpacing(20);
+        setPadding(new Insets(10, 24, 10, 24));
 
         String glassBg = Theme.isDark()
-            ? "rgba(20,20,30,0.6)"
-            : "rgba(255,255,255,0.55)";
+            ? "rgba(30,30,45,0.7)"
+            : "rgba(255,255,255,0.65)";
         String glassBorder = Theme.isDark()
-            ? "rgba(255,255,255,0.12)"
-            : "rgba(255,255,255,0.8)";
+            ? "rgba(255,255,255,0.15)"
+            : "rgba(255,255,255,0.9)";
 
         setStyle(String.join(";",
-            "-fx-background-radius: 24px",
+            "-fx-background-radius: 28px",
             "-fx-background-color: " + glassBg,
             "-fx-border-color: " + glassBorder,
-            "-fx-border-radius: 24px",
+            "-fx-border-radius: 28px",
             "-fx-border-width: 1px"
         ));
-
-        GaussianBlur blur = new GaussianBlur(0);
-        blur.setRadius(12);
-        setEffect(blur);
 
         StackPane logoPane = new StackPane();
         logoPane.setPrefSize(28, 28);
@@ -71,7 +66,7 @@ public class TopBar extends HBox {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox navBox = new HBox(20);
+        HBox navBox = new HBox(24);
         navBox.setAlignment(Pos.CENTER);
         navBox.getChildren().addAll(
             navBtn("Home", true),
@@ -83,18 +78,18 @@ public class TopBar extends HBox {
         HBox.setHgrow(spacer2, Priority.ALWAYS);
 
         StackPane toggle = new StackPane();
-        toggle.setPrefWidth(44);
-        toggle.setPrefHeight(24);
-        toggle.setMaxWidth(44);
-        toggle.setMaxHeight(24);
+        toggle.setPrefWidth(48);
+        toggle.setPrefHeight(26);
+        toggle.setMaxWidth(48);
+        toggle.setMaxHeight(26);
         toggle.setStyle(String.join(";",
-            "-fx-background-radius: 12px",
+            "-fx-background-radius: 13px",
             "-fx-background-color: " + (Theme.isDark() ? "#6C5CE7" : "#2D3436"),
             "-fx-cursor: hand"
         ));
 
-        Circle thumb = new Circle(9, Color.WHITE);
-        thumb.setTranslateX(Theme.isDark() ? 9 : -9);
+        Circle thumb = new Circle(10, Color.WHITE);
+        thumb.setTranslateX(Theme.isDark() ? 10 : -10);
         toggle.getChildren().add(thumb);
 
         toggle.setOnMouseClicked(e -> {
@@ -107,7 +102,7 @@ public class TopBar extends HBox {
     private Label navBtn(String text, boolean active) {
         String color = Theme.isDark() ? (active ? "#FFFFFF" : "rgba(255,255,255,0.65)") : "#000000";
         Label l = new Label(text);
-        l.setFont(Fonts.body(14));
+        l.setFont(Fonts.body(15));
         l.setStyle(String.join(";",
             "-fx-text-fill: " + color,
             "-fx-font-weight: " + (active ? "bold" : "normal"),
