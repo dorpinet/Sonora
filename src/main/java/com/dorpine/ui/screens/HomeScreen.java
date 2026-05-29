@@ -39,9 +39,9 @@ public class HomeScreen extends VBox {
             List<String> genres = ApiClient.getGenres();
 
             List<Playlist> stubPlaylists = new ArrayList<>();
-            Playlist liked = new Playlist(); liked.setName("Liked"); liked.setDescription("Your favorite tracks"); stubPlaylists.add(liked);
-            Playlist recent = new Playlist(); recent.setName("Recently Played"); recent.setDescription("Tracks you listened to"); stubPlaylists.add(recent);
-            Playlist favs = new Playlist(); favs.setName("For Your Favs"); favs.setDescription("Meditation vibes"); stubPlaylists.add(favs);
+            Playlist liked = new Playlist(); liked.setName("Liked"); liked.setDescription("Your favorite tracks"); liked.setCoverUrl("\u2764\uFE0F"); stubPlaylists.add(liked);
+            Playlist recent = new Playlist(); recent.setName("Recently Played"); recent.setDescription("Tracks you listened to"); recent.setCoverUrl("\u25B6\uFE0F"); stubPlaylists.add(recent);
+            Playlist favs = new Playlist(); favs.setName("For Your Favs"); favs.setDescription("Meditation vibes"); favs.setCoverUrl("\u2600\uFE0F"); stubPlaylists.add(favs);
 
             Platform.runLater(() -> {
                 addSectionTitle("Sheet notes");

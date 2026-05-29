@@ -30,7 +30,7 @@ public class TopBar extends HBox {
     private void build() {
         setAlignment(Pos.CENTER);
         setSpacing(20);
-        setPadding(new Insets(10, 24, 10, 24));
+        setPadding(new Insets(10, 40, 10, 40));
 
         String glassBg = Theme.isDark()
             ? "rgba(30,30,45,0.7)"

@@ -63,7 +63,7 @@ public class TrackCard extends StackPane {
         imgPane.setMinSize(150, 150);
         imgPane.setMaxSize(150, 150);
 
-        if (cover != null && !cover.isEmpty()) {
+        if (cover != null && !cover.isEmpty() && cover.startsWith("http")) {
             try {
                 Image img = new Image(cover, 150, 150, true, true, true);
                 ImageView iv = new ImageView(img);
@@ -78,6 +78,8 @@ public class TrackCard extends StackPane {
             } catch (Exception e) {
                 imgPane.getChildren().add(placeholder(title));
             }
+        } else if (cover != null && !cover.isEmpty()) {
+            imgPane.getChildren().add(emojiPlaceholder(cover));
         } else {
             imgPane.getChildren().add(placeholder(title));
         }
@@ -114,6 +116,16 @@ public class TrackCard extends StackPane {
         Label l = new Label(title != null && !title.isEmpty() ? title.substring(0, 1).toUpperCase() : "?");
         l.setFont(Fonts.heading(36));
         l.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + ";");
+        p.getChildren().add(l);
+        return p;
+    }
+
+    private StackPane emojiPlaceholder(String emoji) {
+        StackPane p = new StackPane();
+        p.setPrefSize(150, 150);
+        p.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.5)")) + "; -fx-background-radius: 14px;");
+        Label l = new Label(emoji);
+        l.setStyle("-fx-font-size: 56px;");
         p.getChildren().add(l);
         return p;
     }
