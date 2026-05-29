@@ -9,6 +9,7 @@ import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
