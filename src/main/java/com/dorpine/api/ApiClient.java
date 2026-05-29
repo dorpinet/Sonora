@@ -8,9 +8,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +31,7 @@ public class ApiClient {
 
     public static List<Track> getTracks(String genre) {
         try {
-            String url = BASE_URL + "/tracks" + (genre != null && !genre.isEmpty() ? "?genre=" + genre : "");
+            String url = BASE_URL + "/tracks" + (genre != null && !genre.isEmpty() ? "?genre=" + URLEncoder.encode(genre, StandardCharsets.UTF_8) : "");
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Accept", "application/json")
