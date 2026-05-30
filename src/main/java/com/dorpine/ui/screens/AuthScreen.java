@@ -41,25 +41,28 @@ public class AuthScreen extends StackPane {
     private void build() {
         setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
 
-        // Dim overlay
         Region overlay = new Region();
-        overlay.setStyle("-fx-background-color: " + (Theme.isDark() ? "rgba(10,10,18,0.85)" : "rgba(232,224,255,0.92)") + ";");
+        overlay.setStyle("-fx-background-color: rgba(10,10,18,0.6);");
 
-        card = new VBox(14);
+        card = new VBox(10);
         card.setAlignment(Pos.TOP_CENTER);
-        card.setMaxWidth(400);
-        card.setPadding(new Insets(32, 28, 32, 28));
+        card.setPrefWidth(340);
+        card.setMaxWidth(340);
+        card.setMinWidth(340);
+        card.setMaxHeight(Region.USE_PREF_SIZE);
+        card.setPadding(new Insets(24, 24, 20, 24));
+        String glassBg = Theme.isDark() ? "rgba(30,30,45,0.55)" : "rgba(255,255,255,0.55)";
+        String glassBorder = Theme.isDark() ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.8)";
         card.setStyle(String.join(";",
-            "-fx-background-color: " + (Theme.isDark() ? "rgba(30,30,45,0.85)" : "rgba(255,255,255,0.75)"),
+            "-fx-background-color: " + glassBg,
             "-fx-background-radius: 20px",
-            "-fx-border-color: " + (Theme.isDark() ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.7)"),
+            "-fx-border-color: " + glassBorder,
             "-fx-border-radius: 20px",
-            "-fx-border-width: 1px",
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0, 0, 8)"
+            "-fx-border-width: 1px"
         ));
 
         titleLabel = new Label("Login");
-        titleLabel.setFont(Fonts.heading(24));
+        titleLabel.setFont(Fonts.heading(22));
         titleLabel.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         titleLabel.setAlignment(Pos.CENTER);
 
@@ -77,7 +80,7 @@ public class AuthScreen extends StackPane {
         confirmPasswordField = createPasswordField("Confirm password");
         codeField = createField("Enter code");
 
-        sendCodeBtn = createSecondaryBtn("Send via email");
+        sendCodeBtn = createOutlineBtn("Send via email");
         sendCodeBtn.setOnAction(e -> handleSendCode());
 
         primaryBtn = createPrimaryBtn("Login");
@@ -89,7 +92,7 @@ public class AuthScreen extends StackPane {
         secondaryLink = createLink("Forgot password?");
         secondaryLink.setOnMouseClicked(e -> switchMode(Mode.FORGOT));
 
-        VBox fieldsBox = new VBox(10);
+        VBox fieldsBox = new VBox(8);
         fieldsBox.setAlignment(Pos.TOP_CENTER);
         fieldsBox.setFillWidth(true);
         fieldsBox.getChildren().addAll(
@@ -97,7 +100,7 @@ public class AuthScreen extends StackPane {
             confirmPasswordField, sendCodeBtn, codeField, primaryBtn
         );
 
-        HBox linksBox = new HBox(16);
+        HBox linksBox = new HBox(14);
         linksBox.setAlignment(Pos.CENTER);
         linksBox.getChildren().addAll(linkLabel, secondaryLink);
 
@@ -113,15 +116,16 @@ public class AuthScreen extends StackPane {
         TextField f = new TextField();
         f.setPromptText(prompt);
         f.setFont(Fonts.body(14));
+        String bg = Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.5)";
         f.setStyle(String.join(";",
-            "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.6)"),
+            "-fx-background-color: " + bg,
             "-fx-background-radius: 12px",
             "-fx-text-fill: " + Theme.toCss(Theme.textPrimary()),
             "-fx-prompt-text-fill: " + Theme.toCss(Theme.textSecondary()),
             "-fx-padding: 10 14",
             "-fx-border-width: 0"
         ));
-        f.setPrefHeight(40);
+        f.setPrefHeight(38);
         f.setMaxWidth(Double.MAX_VALUE);
         return f;
     }
@@ -130,47 +134,49 @@ public class AuthScreen extends StackPane {
         PasswordField f = new PasswordField();
         f.setPromptText(prompt);
         f.setFont(Fonts.body(14));
+        String bg = Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.5)";
         f.setStyle(String.join(";",
-            "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.6)"),
+            "-fx-background-color: " + bg,
             "-fx-background-radius: 12px",
             "-fx-text-fill: " + Theme.toCss(Theme.textPrimary()),
             "-fx-prompt-text-fill: " + Theme.toCss(Theme.textSecondary()),
             "-fx-padding: 10 14",
             "-fx-border-width: 0"
         ));
-        f.setPrefHeight(40);
+        f.setPrefHeight(38);
         f.setMaxWidth(Double.MAX_VALUE);
         return f;
     }
 
     private Button createPrimaryBtn(String text) {
         Button b = new Button(text);
-        b.setFont(Fonts.heading(15));
+        b.setFont(Fonts.heading(14));
         b.setStyle(String.join(";",
             "-fx-background-color: " + Theme.toCss(Theme.accent()),
             "-fx-text-fill: #FFFFFF",
             "-fx-background-radius: 24px",
-            "-fx-padding: 12 24",
+            "-fx-padding: 10 20",
             "-fx-cursor: hand",
             "-fx-font-weight: bold"
         ));
         b.setMaxWidth(Double.MAX_VALUE);
-        b.setPrefHeight(44);
+        b.setPrefHeight(42);
         return b;
     }
 
-    private Button createSecondaryBtn(String text) {
+    private Button createOutlineBtn(String text) {
         Button b = new Button(text);
         b.setFont(Fonts.body(13));
+        String accent = Theme.toCss(Theme.accent());
         b.setStyle(String.join(";",
-            "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.5)"),
-            "-fx-text-fill: " + Theme.toCss(Theme.textPrimary()),
+            "-fx-background-color: transparent",
+            "-fx-text-fill: " + accent,
             "-fx-background-radius: 24px",
             "-fx-padding: 8 20",
             "-fx-cursor: hand",
-            "-fx-border-color: " + (Theme.isDark() ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.6)"),
+            "-fx-border-color: " + accent,
             "-fx-border-radius: 24px",
-            "-fx-border-width: 1px"
+            "-fx-border-width: 1.5px"
         ));
         b.setMaxWidth(Double.MAX_VALUE);
         b.setPrefHeight(36);
@@ -222,7 +228,6 @@ public class AuthScreen extends StackPane {
                 confirmPasswordField.setVisible(true);
                 sendCodeBtn.setVisible(true);
                 codeField.setVisible(true);
-                // Reorder: nickname, password, confirm, email, sendCode, code, primaryBtn
                 VBox parent = (VBox) emailField.getParent();
                 parent.getChildren().clear();
                 parent.getChildren().addAll(nicknameField, passwordField, confirmPasswordField, emailField, sendCodeBtn, codeField, primaryBtn);

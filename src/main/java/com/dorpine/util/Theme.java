@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 
 public class Theme {
 
-    private static boolean darkMode = false;
+    private static boolean darkMode = true;
 
     public static boolean isDark() { return darkMode; }
 
@@ -12,8 +12,8 @@ public class Theme {
         darkMode = !darkMode;
     }
 
-    public static Color bgStart()    { return darkMode ? Color.web("#0a0a12") : Color.web("#E8E0FF"); }
-    public static Color bgEnd()      { return darkMode ? Color.web("#1a0a2e") : Color.web("#C4B5FD"); }
+    public static Color bgStart()    { return darkMode ? Color.web("#0d0618") : Color.web("#E8E0FF"); }
+    public static Color bgEnd()      { return darkMode ? Color.web("#1e1040") : Color.web("#C4B5FD"); }
     public static Color cardBg()     { return darkMode ? Color.web("rgba(255,255,255,0.06)") : Color.web("rgba(255,255,255,0.5)"); }
     public static Color cardBorder() { return darkMode ? Color.web("rgba(255,255,255,0.12)") : Color.web("rgba(255,255,255,0.6)"); }
     public static Color accent()     { return darkMode ? Color.web("#8B5CF6") : Color.web("#7C3AED"); }
