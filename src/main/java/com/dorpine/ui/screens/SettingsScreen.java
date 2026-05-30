@@ -38,14 +38,15 @@ public class SettingsScreen extends StackPane {
 
         HBox contentBox = new HBox(24);
         contentBox.setAlignment(Pos.TOP_CENTER);
+        contentBox.setFillHeight(false);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
         VBox.setVgrow(contentBox, Priority.ALWAYS);
         contentBox.setMaxWidth(Double.MAX_VALUE);
 
-        // Left: user card
-        VBox userCard = new VBox(8);
+        VBox userCard = new VBox(10);
         userCard.setAlignment(Pos.TOP_CENTER);
-        userCard.setPadding(new Insets(12));
+        userCard.setPadding(new Insets(16));
+        userCard.setMaxHeight(Region.USE_PREF_SIZE);
         userCard.setStyle(String.join(";",
             "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.45)"),
             "-fx-background-radius: 20px",
@@ -53,37 +54,37 @@ public class SettingsScreen extends StackPane {
             "-fx-border-radius: 20px",
             "-fx-border-width: 1px"
         ));
-        userCard.setPrefWidth(220);
-        userCard.setMaxWidth(260);
-        userCard.setMinWidth(200);
+        userCard.setPrefWidth(260);
+        userCard.setMaxWidth(300);
+        userCard.setMinWidth(220);
 
         StackPane avatarPane = new StackPane();
-        avatarPane.setPrefSize(120, 120);
-        avatarPane.setMinSize(120, 120);
-        avatarPane.setMaxSize(120, 120);
-        avatarPane.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.2)")) + "; -fx-background-radius: 16px;");
+        avatarPane.setPrefSize(150, 150);
+        avatarPane.setMinSize(150, 150);
+        avatarPane.setMaxSize(150, 150);
+        avatarPane.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.2)")) + "; -fx-background-radius: 20px;");
 
         String avatarUrl = "https://pub-b7eac54927804333ac001f55505f5006.r2.dev/Noicon(1).jpg";
         try {
-            Image img = new Image(avatarUrl, 120, 120, true, true, true);
+            Image img = new Image(avatarUrl, 150, 150, true, true, true);
             ImageView iv = new ImageView(img);
-            iv.setFitWidth(120);
-            iv.setFitHeight(120);
+            iv.setFitWidth(150);
+            iv.setFitHeight(150);
             iv.setPreserveRatio(true);
-            Rectangle c = new Rectangle(120, 120);
-            c.setArcWidth(16);
-            c.setArcHeight(16);
+            Rectangle c = new Rectangle(150, 150);
+            c.setArcWidth(20);
+            c.setArcHeight(20);
             iv.setClip(c);
             avatarPane.getChildren().add(iv);
         } catch (Exception e) {
             Label placeholder = new Label("U");
-            placeholder.setFont(Fonts.heading(48));
+            placeholder.setFont(Fonts.heading(56));
             placeholder.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + ";");
             avatarPane.getChildren().add(placeholder);
         }
 
         Label username = new Label("@67diva");
-        username.setFont(Fonts.heading(18));
+        username.setFont(Fonts.heading(22));
         username.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         username.setAlignment(Pos.CENTER);
 
