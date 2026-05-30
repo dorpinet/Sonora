@@ -37,7 +37,7 @@ public class TrackCard extends StackPane {
 
     private void build(String cover, String title, String artist) {
         setAlignment(Pos.TOP_CENTER);
-        setPadding(new Insets(10));
+        setPadding(new Insets(6));
         String baseStyle = String.join(";",
             "-fx-background-color: " + Theme.toCss(Theme.cardBg()),
             "-fx-background-radius: 16px",
@@ -50,13 +50,13 @@ public class TrackCard extends StackPane {
 
         DropShadow shadow = new DropShadow();
         shadow.setColor(Color.web("rgba(0,0,0,0.08)"));
-        shadow.setRadius(12);
-        shadow.setOffsetY(4);
+        shadow.setRadius(8);
+        shadow.setOffsetY(3);
         setEffect(shadow);
 
-        VBox content = new VBox(8);
+        VBox content = new VBox(6);
         content.setAlignment(Pos.TOP_CENTER);
-        content.setPadding(new Insets(8));
+        content.setPadding(new Insets(4));
 
         StackPane imgPane = new StackPane();
         imgPane.setPrefSize(150, 150);

@@ -23,6 +23,7 @@ public class App extends Application {
     private StackPane root;
     private DetailsPanel detailsPanel;
     private Object currentItem;
+    private String currentScreen = "home";
 
     @Override
     public void start(Stage stage) {
@@ -39,6 +40,7 @@ public class App extends Application {
     }
 
     private void showHome() {
+        currentScreen = "home";
         root.getChildren().clear();
 
         HBox mainBox = new HBox();
@@ -72,8 +74,7 @@ public class App extends Application {
 
     private void toggleTheme() {
         Theme.toggle();
-        root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
-        showHome();
+        navigateTo(currentScreen);
     }
 
     private void showDetails(Object item) {
@@ -104,13 +105,13 @@ public class App extends Application {
     }
 
     private void navigateTo(String screen) {
+        currentScreen = screen;
         if (screen.equals("home")) { showHome(); return; }
         root.getChildren().clear();
         root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
         switch (screen) {
-            case "settings", "account" -> root.getChildren().add(new SettingsScreen(this::navigateTo));
-            case "library" -> root.getChildren().add(new LibraryScreen(this::navigateTo));
-            case "theory"   -> root.getChildren().add(new TheoryScreen(this::navigateTo));
+            case "settings" -> root.getChildren().add(new SettingsScreen(this::navigateTo, () -> Platform.runLater(this::toggleTheme)));
+            case "theory"   -> root.getChildren().add(new TheoryScreen(this::navigateTo, () -> Platform.runLater(this::toggleTheme)));
             case "piano"    -> {
                 Note note = (currentItem instanceof Note n) ? n : null;
                 root.getChildren().add(new PianoScreen(note, this::navigateTo));
@@ -123,7 +124,7 @@ public class App extends Application {
                     if (name.equals("Liked")) stub.setDescription("Your favorite tracks");
                     else if (name.equals("Recently Played")) stub.setDescription("Tracks you listened to");
                     else if (name.equals("For Your Favs")) stub.setDescription("Meditation vibes");
-                    root.getChildren().add(new PlaylistDetailScreen(stub, this::navigateTo));
+                    root.getChildren().add(new PlaylistDetailScreen(stub, this::navigateTo, () -> Platform.runLater(this::toggleTheme)));
                 } else { showHome(); }
             }
         }

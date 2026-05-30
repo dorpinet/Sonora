@@ -18,9 +18,11 @@ import java.util.function.Consumer;
 
 public class PlaylistDetailScreen extends StackPane {
     private final Consumer<String> navHandler;
+    private final Runnable themeToggleHandler;
 
-    public PlaylistDetailScreen(Playlist playlist, Consumer<String> navHandler) {
+    public PlaylistDetailScreen(Playlist playlist, Consumer<String> navHandler, Runnable themeToggleHandler) {
         this.navHandler = navHandler;
+        this.themeToggleHandler = themeToggleHandler;
         build(playlist);
     }
 
@@ -32,7 +34,7 @@ public class PlaylistDetailScreen extends StackPane {
         mainBox.setPadding(new Insets(20, 24, 24, 24));
         mainBox.setFillWidth(true);
 
-        TopBar topBar = new TopBar(navHandler, null);
+        TopBar topBar = new TopBar(navHandler, themeToggleHandler);
         topBar.setMaxWidth(Double.MAX_VALUE);
         VBox.setVgrow(topBar, Priority.NEVER);
 
@@ -42,9 +44,9 @@ public class PlaylistDetailScreen extends StackPane {
         VBox.setVgrow(contentBox, Priority.ALWAYS);
         contentBox.setMaxWidth(Double.MAX_VALUE);
 
-        VBox playlistCard = new VBox(6);
+        VBox playlistCard = new VBox(4);
         playlistCard.setAlignment(Pos.TOP_CENTER);
-        playlistCard.setPadding(new Insets(12));
+        playlistCard.setPadding(new Insets(8));
         playlistCard.setStyle(String.join(";",
             "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.45)"),
             "-fx-background-radius: 16px",

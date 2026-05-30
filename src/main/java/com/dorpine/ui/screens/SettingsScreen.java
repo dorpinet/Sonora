@@ -16,9 +16,11 @@ import java.util.function.Consumer;
 
 public class SettingsScreen extends StackPane {
     private final Consumer<String> navHandler;
+    private final Runnable themeToggleHandler;
 
-    public SettingsScreen(Consumer<String> navHandler) {
+    public SettingsScreen(Consumer<String> navHandler, Runnable themeToggleHandler) {
         this.navHandler = navHandler;
+        this.themeToggleHandler = themeToggleHandler;
         build();
     }
 
@@ -30,8 +32,7 @@ public class SettingsScreen extends StackPane {
         mainBox.setPadding(new Insets(20, 24, 24, 24));
         mainBox.setFillWidth(true);
 
-        // TopBar
-        com.dorpine.ui.components.TopBar topBar = new com.dorpine.ui.components.TopBar(navHandler, null);
+        com.dorpine.ui.components.TopBar topBar = new com.dorpine.ui.components.TopBar(navHandler, themeToggleHandler);
         topBar.setMaxWidth(Double.MAX_VALUE);
         VBox.setVgrow(topBar, Priority.NEVER);
 
@@ -42,9 +43,9 @@ public class SettingsScreen extends StackPane {
         contentBox.setMaxWidth(Double.MAX_VALUE);
 
         // Left: user card
-        VBox userCard = new VBox(12);
+        VBox userCard = new VBox(8);
         userCard.setAlignment(Pos.TOP_CENTER);
-        userCard.setPadding(new Insets(20));
+        userCard.setPadding(new Insets(12));
         userCard.setStyle(String.join(";",
             "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.45)"),
             "-fx-background-radius: 20px",
