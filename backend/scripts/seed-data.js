@@ -126,7 +126,7 @@ async function seed() {
         {
           userId: user._id,
           name: 'For Your Favs',
-          description: 'Meditation vibes',
+          description: 'Explore new tracks!',
           type: 'user_created',
           tracks: dailyTracks,
           coverUrl: dailyTracks[0]?.coverUrl,
@@ -134,7 +134,7 @@ async function seed() {
         {
           userId: user._id,
           name: 'Daily Mix',
-          description: 'Fresh daily picks',
+          description: 'Explore new tracks!',
           type: 'daily',
           tracks: dailyTracks,
           coverUrl: dailyTracks[0]?.coverUrl,

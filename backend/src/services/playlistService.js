@@ -7,45 +7,43 @@ class PlaylistService {
   static CATEGORY_MAP = {
     'sport': {
       genres: ['Rage', 'Drain'],
-      description: 'High-energy tracks for workouts and sports',
     },
     'meditation': {
       genres: ['City Pop', 'Dreamwave', 'Darkwave'],
-      description: 'Chill vibes for relaxation and meditation',
     },
     'party': {
       genres: ['Hyperpop', 'Electropop', 'Witch House'],
-      description: 'Upbeat tracks for parties and fun',
     },
     'focus': {
       genres: ['Breakcore', 'Electronic', 'Witch House'],
-      description: 'Intense concentration music for coding and deep work',
     },
   };
 
 
   static async generateDailyPlaylist(userId, interests = []) {
-
     const primaryInterest = interests.length > 0 ? interests[0].toLowerCase() : 'focus';
     const category = this.CATEGORY_MAP[primaryInterest] || this.CATEGORY_MAP['focus'];
     const targetGenres = category.genres;
 
-
-
-    const tracks = await Track.aggregate([
+    let tracks = await Track.aggregate([
       { $match: { genre: { $in: targetGenres } } },
       { $sample: { size: 7 } },
     ]);
 
-
     if (tracks.length < 5) {
       const additional = await Track.aggregate([
         { $match: { genre: { $nin: targetGenres } } },
-        { $sample: { size: 5 - tracks.length } },
+        { $sample: { size: 7 - tracks.length } },
       ]);
       tracks.push(...additional);
     }
 
+    if (tracks.length < 5) {
+      const fallback = await Track.aggregate([
+        { $sample: { size: 7 - tracks.length } },
+      ]);
+      tracks.push(...fallback);
+    }
 
     const playlistTracks = tracks.map(t => ({
       trackId: t._id,
@@ -55,30 +53,16 @@ class PlaylistService {
       addedAt: new Date(),
     }));
 
-
-    const now = new Date();
-    const hour = now.getHours();
-    let timeLabel = '';
-    if (hour >= 5 && hour < 12) timeLabel = 'Morning';
-    else if (hour >= 12 && hour < 17) timeLabel = 'Afternoon';
-    else if (hour >= 17 && hour < 22) timeLabel = 'Evening';
-    else timeLabel = 'Night';
-
-    const interestLabel = primaryInterest.charAt(0).toUpperCase() + primaryInterest.slice(1);
-    const name = `${timeLabel} ${interestLabel}`;
-
-
     await Playlist.deleteOne({ userId, type: 'daily' });
-
 
     const playlist = await Playlist.create({
       userId,
-      name,
-      description: category.description,
+      name: 'Daily Mix',
+      description: 'Explore new tracks!',
       type: 'daily',
       genre: targetGenres.join(', '),
       tracks: playlistTracks,
-      generatedDate: now,
+      generatedDate: new Date(),
     });
 
     return playlist;

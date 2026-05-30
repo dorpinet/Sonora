@@ -122,9 +122,15 @@ public class InterestScreen extends StackPane {
         new Thread(() -> {
             List<String> lower = selected.stream().map(String::toLowerCase).toList();
             ApiClient.AuthResult r1 = ApiClient.saveInterests(lower);
+            if (!r1.success) {
+                Platform.runLater(() -> {
+                    for (Button b : interestBtns) b.setDisable(false);
+                });
+                return;
+            }
             ApiClient.AuthResult r2 = ApiClient.regenerateDaily();
             Platform.runLater(() -> {
-                if (r1.success || r2.success) {
+                if (r2.success) {
                     navHandler.accept("home");
                 } else {
                     for (Button b : interestBtns) b.setDisable(false);
