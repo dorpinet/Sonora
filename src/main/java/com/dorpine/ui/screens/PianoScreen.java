@@ -1,8 +1,10 @@
 package com.dorpine.ui.screens;
 
 import com.dorpine.model.Note;
+import com.dorpine.ui.components.PianoKeys;
 import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
