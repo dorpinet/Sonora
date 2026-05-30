@@ -31,8 +31,6 @@ public class ApiClient {
 
     private ApiClient() {}
 
-    // ========== Auth ==========
-
     private static String extractError(String body) {
         String trimmed = body.trim();
         if (trimmed.isEmpty()) return "Empty response";
@@ -62,6 +60,8 @@ public class ApiClient {
             return false;
         }
     }
+
+    // ========== Auth ==========
 
     public static AuthResult login(String email, String password) {
         try {
@@ -230,6 +230,180 @@ public class ApiClient {
         }
     }
 
+    // ========== User ==========
+
+    public static UserProfile getProfile() {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return null;
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/me"))
+                    .header("Accept", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JsonNode root = MAPPER.readTree(response.body());
+                JsonNode user = root.get("user");
+                if (user != null) {
+                    return MAPPER.treeToValue(user, UserProfile.class);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[API] Get profile error: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public static AuthResult updateUsername(String newUsername, String password) {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return new AuthResult(false, "Not authenticated");
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("username", newUsername); put("password", password);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/users/username"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .PUT(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new AuthResult(true, null);
+            } else {
+                return new AuthResult(false, extractError(response.body()));
+            }
+        } catch (Exception e) {
+            return new AuthResult(false, "Network error: " + e.getMessage());
+        }
+    }
+
+    public static AuthResult changePassword(String currentPassword, String newPassword, String confirmPassword) {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return new AuthResult(false, "Not authenticated");
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("currentPassword", currentPassword); put("newPassword", newPassword); put("confirmPassword", confirmPassword);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/users/password"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .PUT(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new AuthResult(true, null);
+            } else {
+                return new AuthResult(false, extractError(response.body()));
+            }
+        } catch (Exception e) {
+            return new AuthResult(false, "Network error: " + e.getMessage());
+        }
+    }
+
+    public static AuthResult changeEmailInit(String newEmail, String password) {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return new AuthResult(false, "Not authenticated");
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("newEmail", newEmail); put("password", password);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/change-email-init"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new AuthResult(true, null);
+            } else {
+                return new AuthResult(false, extractError(response.body()));
+            }
+        } catch (Exception e) {
+            return new AuthResult(false, "Network error: " + e.getMessage());
+        }
+    }
+
+    public static AuthResult changeEmailVerify(String newEmail, String code) {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return new AuthResult(false, "Not authenticated");
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("newEmail", newEmail); put("code", code);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/change-email-verify"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new AuthResult(true, null);
+            } else {
+                return new AuthResult(false, extractError(response.body()));
+            }
+        } catch (Exception e) {
+            return new AuthResult(false, "Network error: " + e.getMessage());
+        }
+    }
+
+    public static AuthResult saveInterests(List<String> interests) {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return new AuthResult(false, "Not authenticated");
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, Object>() {{
+                put("interests", interests);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/users/interests"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new AuthResult(true, null);
+            } else {
+                return new AuthResult(false, extractError(response.body()));
+            }
+        } catch (Exception e) {
+            return new AuthResult(false, "Network error: " + e.getMessage());
+        }
+    }
+
+    public static AuthResult regenerateDaily() {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return new AuthResult(false, "Not authenticated");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/playlists/regenerate-daily"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new AuthResult(true, null);
+            } else {
+                return new AuthResult(false, extractError(response.body()));
+            }
+        } catch (Exception e) {
+            return new AuthResult(false, "Network error: " + e.getMessage());
+        }
+    }
+
     // ========== Data ==========
 
     public static List<Track> getTracks(String genre) {
@@ -319,6 +493,39 @@ public class ApiClient {
             }
         } catch (Exception e) {
             System.err.println("[API] Fetch genres error: " + e.getMessage());
+        }
+        return Collections.emptyList();
+    }
+
+    public static List<Playlist> getPlaylists() {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return Collections.emptyList();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/playlists"))
+                    .header("Accept", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JsonNode root = MAPPER.readTree(response.body());
+                JsonNode playlistsNode = root.get("playlists");
+                if (playlistsNode != null && playlistsNode.isArray()) {
+                    List<Playlist> playlists = new ArrayList<>();
+                    for (JsonNode node : playlistsNode) {
+                        try {
+                            playlists.add(MAPPER.treeToValue(node, Playlist.class));
+                        } catch (Exception ex) {
+                            System.err.println("[API] Parse playlist error: " + ex.getMessage());
+                        }
+                    }
+                    return playlists;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[API] Fetch playlists error: " + e.getMessage());
         }
         return Collections.emptyList();
     }

@@ -25,11 +25,9 @@ public class App extends Application {
     private DetailsPanel detailsPanel;
     private Object currentItem;
     private String currentScreen = "home";
-    private Stage primaryStage;
 
     @Override
     public void start(Stage stage) {
-        this.primaryStage = stage;
         Fonts.load();
         root = new StackPane();
         root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
@@ -48,11 +46,7 @@ public class App extends Application {
 
     private void showAuth() {
         root.getChildren().clear();
-        root.getChildren().add(new AuthScreen(this::onAuthSuccess));
-    }
-
-    private void onAuthSuccess() {
-        Platform.runLater(this::showHome);
+        root.getChildren().add(new AuthScreen(this::navigateTo));
     }
 
     private void showHome() {
@@ -129,6 +123,7 @@ public class App extends Application {
         switch (screen) {
             case "settings" -> root.getChildren().add(new SettingsScreen(this::navigateTo, () -> Platform.runLater(this::toggleTheme)));
             case "theory"   -> root.getChildren().add(new TheoryScreen(this::navigateTo, () -> Platform.runLater(this::toggleTheme)));
+            case "interests" -> root.getChildren().add(new InterestScreen(this::navigateTo));
             case "piano"    -> {
                 Note note = (currentItem instanceof Note n) ? n : null;
                 root.getChildren().add(new PianoScreen(note, this::navigateTo));

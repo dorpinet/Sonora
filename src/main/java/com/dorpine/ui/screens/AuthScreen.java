@@ -12,11 +12,13 @@ import javafx.scene.layout.*;
 import java.util.function.Consumer;
 
 public class AuthScreen extends StackPane {
-    private final Consumer<String> onAuthSuccess;
+    private final Consumer<String> navHandler;
 
     private VBox card;
     private Label titleLabel;
     private Label errorLabel;
+    private VBox fieldsBox;
+    private HBox linksBox;
 
     private TextField emailField;
     private PasswordField passwordField;
@@ -33,8 +35,8 @@ public class AuthScreen extends StackPane {
 
     enum Mode { LOGIN, REGISTER, FORGOT }
 
-    public AuthScreen(Runnable onAuthSuccess) {
-        this.onAuthSuccess = (s) -> onAuthSuccess.run();
+    public AuthScreen(Consumer<String> navHandler) {
+        this.navHandler = navHandler;
         build();
     }
 
@@ -44,7 +46,6 @@ public class AuthScreen extends StackPane {
         Region overlay = new Region();
         overlay.setStyle("-fx-background-color: rgba(10,10,18,0.6);");
 
-        // Ping server in background to wake it up
         new Thread(() -> {
             boolean ok = com.dorpine.api.ApiClient.wakeUp();
             Platform.runLater(() -> {
@@ -54,13 +55,13 @@ public class AuthScreen extends StackPane {
             });
         }).start();
 
-        card = new VBox(10);
+        card = new VBox(8);
         card.setAlignment(Pos.TOP_CENTER);
         card.setPrefWidth(340);
         card.setMaxWidth(340);
         card.setMinWidth(340);
         card.setMaxHeight(Region.USE_PREF_SIZE);
-        card.setPadding(new Insets(24, 24, 20, 24));
+        card.setPadding(new Insets(20));
         String glassBg = Theme.isDark() ? "rgba(30,30,45,0.55)" : "rgba(255,255,255,0.55)";
         String glassBorder = Theme.isDark() ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.8)";
         card.setStyle(String.join(";",
@@ -72,12 +73,12 @@ public class AuthScreen extends StackPane {
         ));
 
         titleLabel = new Label("Login");
-        titleLabel.setFont(Fonts.heading(22));
+        titleLabel.setFont(Fonts.heading(20));
         titleLabel.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         titleLabel.setAlignment(Pos.CENTER);
 
         errorLabel = new Label("");
-        errorLabel.setFont(Fonts.body(12));
+        errorLabel.setFont(Fonts.body(11));
         errorLabel.setStyle("-fx-text-fill: #EF4444;");
         errorLabel.setWrapText(true);
         errorLabel.setAlignment(Pos.CENTER);
@@ -96,21 +97,17 @@ public class AuthScreen extends StackPane {
         primaryBtn = createPrimaryBtn("Login");
         primaryBtn.setOnAction(e -> handlePrimary());
 
+        fieldsBox = new VBox(6);
+        fieldsBox.setAlignment(Pos.TOP_CENTER);
+        fieldsBox.setFillWidth(true);
+
         linkLabel = createLink("Don't have an account?");
         linkLabel.setOnMouseClicked(e -> switchMode(Mode.REGISTER));
 
         secondaryLink = createLink("Forgot password?");
         secondaryLink.setOnMouseClicked(e -> switchMode(Mode.FORGOT));
 
-        VBox fieldsBox = new VBox(8);
-        fieldsBox.setAlignment(Pos.TOP_CENTER);
-        fieldsBox.setFillWidth(true);
-        fieldsBox.getChildren().addAll(
-            emailField, passwordField, nicknameField,
-            confirmPasswordField, sendCodeBtn, codeField, primaryBtn
-        );
-
-        HBox linksBox = new HBox(14);
+        linksBox = new HBox(14);
         linksBox.setAlignment(Pos.CENTER);
         linksBox.getChildren().addAll(linkLabel, secondaryLink);
 
@@ -125,17 +122,17 @@ public class AuthScreen extends StackPane {
     private TextField createField(String prompt) {
         TextField f = new TextField();
         f.setPromptText(prompt);
-        f.setFont(Fonts.body(14));
+        f.setFont(Fonts.body(13));
         String bg = Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.5)";
         f.setStyle(String.join(";",
             "-fx-background-color: " + bg,
             "-fx-background-radius: 12px",
             "-fx-text-fill: " + Theme.toCss(Theme.textPrimary()),
             "-fx-prompt-text-fill: " + Theme.toCss(Theme.textSecondary()),
-            "-fx-padding: 10 14",
+            "-fx-padding: 9 12",
             "-fx-border-width: 0"
         ));
-        f.setPrefHeight(38);
+        f.setPrefHeight(36);
         f.setMaxWidth(Double.MAX_VALUE);
         return f;
     }
@@ -143,17 +140,17 @@ public class AuthScreen extends StackPane {
     private PasswordField createPasswordField(String prompt) {
         PasswordField f = new PasswordField();
         f.setPromptText(prompt);
-        f.setFont(Fonts.body(14));
+        f.setFont(Fonts.body(13));
         String bg = Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.5)";
         f.setStyle(String.join(";",
             "-fx-background-color: " + bg,
             "-fx-background-radius: 12px",
             "-fx-text-fill: " + Theme.toCss(Theme.textPrimary()),
             "-fx-prompt-text-fill: " + Theme.toCss(Theme.textSecondary()),
-            "-fx-padding: 10 14",
+            "-fx-padding: 9 12",
             "-fx-border-width: 0"
         ));
-        f.setPrefHeight(38);
+        f.setPrefHeight(36);
         f.setMaxWidth(Double.MAX_VALUE);
         return f;
     }
@@ -170,32 +167,32 @@ public class AuthScreen extends StackPane {
             "-fx-font-weight: bold"
         ));
         b.setMaxWidth(Double.MAX_VALUE);
-        b.setPrefHeight(42);
+        b.setPrefHeight(40);
         return b;
     }
 
     private Button createOutlineBtn(String text) {
         Button b = new Button(text);
-        b.setFont(Fonts.body(13));
+        b.setFont(Fonts.body(12));
         String accent = Theme.toCss(Theme.accent());
         b.setStyle(String.join(";",
             "-fx-background-color: transparent",
             "-fx-text-fill: " + accent,
             "-fx-background-radius: 24px",
-            "-fx-padding: 8 20",
+            "-fx-padding: 8 16",
             "-fx-cursor: hand",
             "-fx-border-color: " + accent,
             "-fx-border-radius: 24px",
             "-fx-border-width: 1.5px"
         ));
         b.setMaxWidth(Double.MAX_VALUE);
-        b.setPrefHeight(36);
+        b.setPrefHeight(34);
         return b;
     }
 
     private Label createLink(String text) {
         Label l = new Label(text);
-        l.setFont(Fonts.body(12));
+        l.setFont(Fonts.body(11));
         l.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + "; -fx-cursor: hand;");
         return l;
     }
@@ -211,13 +208,7 @@ public class AuthScreen extends StackPane {
         confirmPasswordField.clear();
         codeField.clear();
 
-        emailField.setVisible(true);
-        passwordField.setVisible(true);
-        nicknameField.setVisible(false);
-        confirmPasswordField.setVisible(false);
-        sendCodeBtn.setVisible(false);
-        codeField.setVisible(false);
-        secondaryLink.setVisible(true);
+        fieldsBox.getChildren().clear();
 
         switch (newMode) {
             case LOGIN -> {
@@ -227,6 +218,8 @@ public class AuthScreen extends StackPane {
                 linkLabel.setOnMouseClicked(e -> switchMode(Mode.REGISTER));
                 secondaryLink.setText("Forgot password?");
                 secondaryLink.setOnMouseClicked(e -> switchMode(Mode.FORGOT));
+                secondaryLink.setVisible(true);
+                fieldsBox.getChildren().addAll(emailField, passwordField, primaryBtn);
             }
             case REGISTER -> {
                 titleLabel.setText("Sign Up");
@@ -234,13 +227,7 @@ public class AuthScreen extends StackPane {
                 linkLabel.setText("Already have an account?");
                 linkLabel.setOnMouseClicked(e -> switchMode(Mode.LOGIN));
                 secondaryLink.setVisible(false);
-                nicknameField.setVisible(true);
-                confirmPasswordField.setVisible(true);
-                sendCodeBtn.setVisible(true);
-                codeField.setVisible(true);
-                VBox parent = (VBox) emailField.getParent();
-                parent.getChildren().clear();
-                parent.getChildren().addAll(nicknameField, passwordField, confirmPasswordField, emailField, sendCodeBtn, codeField, primaryBtn);
+                fieldsBox.getChildren().addAll(nicknameField, passwordField, confirmPasswordField, emailField, sendCodeBtn, codeField, primaryBtn);
             }
             case FORGOT -> {
                 titleLabel.setText("Reset Password");
@@ -248,13 +235,7 @@ public class AuthScreen extends StackPane {
                 linkLabel.setText("Back to login");
                 linkLabel.setOnMouseClicked(e -> switchMode(Mode.LOGIN));
                 secondaryLink.setVisible(false);
-                passwordField.setVisible(true);
-                confirmPasswordField.setVisible(true);
-                sendCodeBtn.setVisible(true);
-                codeField.setVisible(true);
-                VBox parent = (VBox) emailField.getParent();
-                parent.getChildren().clear();
-                parent.getChildren().addAll(emailField, sendCodeBtn, codeField, passwordField, confirmPasswordField, primaryBtn);
+                fieldsBox.getChildren().addAll(emailField, sendCodeBtn, codeField, passwordField, confirmPasswordField, primaryBtn);
             }
         }
     }
@@ -322,7 +303,7 @@ public class AuthScreen extends StackPane {
                 primaryBtn.setDisable(false);
                 primaryBtn.setText("Login");
                 if (result.success) {
-                    onAuthSuccess.accept("home");
+                    navHandler.accept("home");
                 } else {
                     showError(result.error);
                 }
@@ -350,7 +331,7 @@ public class AuthScreen extends StackPane {
                 primaryBtn.setDisable(false);
                 primaryBtn.setText("Sign Up");
                 if (result.success) {
-                    onAuthSuccess.accept("home");
+                    navHandler.accept("interests");
                 } else {
                     showError(result.error);
                 }
