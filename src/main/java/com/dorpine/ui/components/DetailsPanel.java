@@ -75,14 +75,20 @@ public class DetailsPanel extends VBox {
         Button playBtn = btn("Play");
         playBtn.setOnAction(e -> {
             stop();
+            recordPlay();
             navHandler.accept("piano");
         });
 
         getChildren().addAll(title, coverPane, nameLabel, artistLabel, listenBtn, playBtn);
     }
 
+    private Track currentTrack;
+    private Note currentNote;
+
     public void showTrack(Track t) {
         if (t == null) { clear(); return; }
+        currentTrack = t;
+        currentNote = null;
         nameLabel.setText(t.getTitle());
         artistLabel.setText(t.getArtist());
         setCover(t.getCoverUrl());
@@ -94,6 +100,8 @@ public class DetailsPanel extends VBox {
 
     public void showNote(Note n) {
         if (n == null) { clear(); return; }
+        currentTrack = null;
+        currentNote = n;
         nameLabel.setText(n.getTitle());
         artistLabel.setText(n.getArtist());
         setCover(n.getCoverUrl() != null ? n.getCoverUrl() : n.getImageUrl());
@@ -126,6 +134,26 @@ public class DetailsPanel extends VBox {
         }
     }
 
+    private void recordPlay() {
+        new Thread(() -> {
+            if (currentTrack != null) {
+                com.dorpine.api.ApiClient.addRecentPlay(
+                    currentTrack.getId() != null ? currentTrack.getId() : currentTrack.getSpotifyId(),
+                    currentTrack.getTitle(),
+                    currentTrack.getArtist(),
+                    currentTrack.getCoverUrl()
+                );
+            } else if (currentNote != null) {
+                com.dorpine.api.ApiClient.addRecentPlay(
+                    currentNote.getId() != null ? currentNote.getId() : currentNote.getSpotifyId(),
+                    currentNote.getTitle(),
+                    currentNote.getArtist(),
+                    currentNote.getCoverUrl() != null ? currentNote.getCoverUrl() : currentNote.getImageUrl()
+                );
+            }
+        }).start();
+    }
+
     private void play() {
         try {
             if (mediaPlayer != null) {
@@ -140,6 +168,7 @@ public class DetailsPanel extends VBox {
                 mediaPlayer.play();
                 playing = true;
                 listenBtn.setText("Pause");
+                recordPlay();
             });
             mediaPlayer.setOnError(() -> {
                 String err = mediaPlayer.getError() != null ? mediaPlayer.getError().getMessage() : "unknown";

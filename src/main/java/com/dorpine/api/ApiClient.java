@@ -530,6 +530,86 @@ public class ApiClient {
         return Collections.emptyList();
     }
 
+    public static AuthResult addRecentPlay(String trackId, String title, String artist, String coverUrl) {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return new AuthResult(false, "Not authenticated");
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("trackId", trackId); put("title", title); put("artist", artist); put("coverUrl", coverUrl);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/recent-plays"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return new AuthResult(response.statusCode() == 201, extractError(response.body()));
+        } catch (Exception e) {
+            return new AuthResult(false, "Network error: " + e.getMessage());
+        }
+    }
+
+    public static List<Track> getRecentPlays() {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return Collections.emptyList();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/recent-plays"))
+                    .header("Accept", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JsonNode root = MAPPER.readTree(response.body());
+                JsonNode arr = root.get("recentPlays");
+                if (arr != null && arr.isArray()) {
+                    List<Track> tracks = new ArrayList<>();
+                    for (JsonNode node : arr) {
+                        Track t = new Track();
+                        t.setId(node.has("trackId") ? node.get("trackId").asText() : "");
+                        t.setTitle(node.has("title") ? node.get("title").asText() : "");
+                        t.setArtist(node.has("artist") ? node.get("artist").asText() : "");
+                        t.setCoverUrl(node.has("coverUrl") ? node.get("coverUrl").asText() : "");
+                        tracks.add(t);
+                    }
+                    return tracks;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[API] Get recent plays error: " + e.getMessage());
+        }
+        return Collections.emptyList();
+    }
+
+    public static Playlist getDaily() {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return null;
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/playlists/daily"))
+                    .header("Accept", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JsonNode root = MAPPER.readTree(response.body());
+                JsonNode playlistNode = root.get("playlist");
+                if (playlistNode != null) {
+                    return MAPPER.treeToValue(playlistNode, Playlist.class);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[API] Get daily error: " + e.getMessage());
+        }
+        return null;
+    }
+
     public static String getPreviewUrl(String spotifyId) {
         try {
             HttpRequest request = HttpRequest.newBuilder()

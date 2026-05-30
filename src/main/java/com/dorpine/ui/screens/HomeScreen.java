@@ -37,23 +37,27 @@ public class HomeScreen extends VBox {
         new Thread(() -> {
             List<Note> notes = ApiClient.getNotes();
             List<String> genres = ApiClient.getGenres();
-
-            List<Playlist> stubPlaylists = new ArrayList<>();
-            Playlist liked = new Playlist(); liked.setName("Liked"); liked.setDescription("Explore new tracks!"); stubPlaylists.add(liked);
-            Playlist recent = new Playlist(); recent.setName("Recently Played"); recent.setDescription("Explore new tracks!"); stubPlaylists.add(recent);
-            Playlist favs = new Playlist(); favs.setName("For Your Favs"); favs.setDescription("Explore new tracks!"); stubPlaylists.add(favs);
+            Playlist daily = ApiClient.getDaily();
 
             Platform.runLater(() -> {
-                addSectionTitle("Sheet notes");
-                HorizontalCarousel notesSection = new HorizontalCarousel("", new ArrayList<>(), 5);
-                getChildren().add(notesSection);
-                if (!notes.isEmpty()) {
-                    List<TrackCard> noteCards = new ArrayList<>();
-                    for (Note n : notes) noteCards.add(new TrackCard(n, item -> detailsHandler.accept(item)));
-                    notesSection.setCards(noteCards);
+                // Daily Mix
+                if (daily != null) {
+                    addSectionTitle("Daily Mix");
+                    HBox dailyBox = new HBox(16);
+                    dailyBox.setAlignment(Pos.CENTER);
+                    dailyBox.getChildren().add(new TrackCard(daily, item -> {
+                        if (item instanceof Playlist pl) navHandler.accept("playlist:" + pl.getName());
+                    }));
+                    getChildren().add(dailyBox);
                 }
 
+                // My playlists (static stubs)
                 addSectionTitle("My playlists");
+                List<Playlist> stubPlaylists = new ArrayList<>();
+                Playlist liked = new Playlist(); liked.setName("Liked"); liked.setDescription("Explore new tracks!"); stubPlaylists.add(liked);
+                Playlist recent = new Playlist(); recent.setName("Recently Played"); recent.setDescription("Explore new tracks!"); stubPlaylists.add(recent);
+                Playlist favs = new Playlist(); favs.setName("For Your Favs"); favs.setDescription("Explore new tracks!"); stubPlaylists.add(favs);
+
                 HBox playlistsBox = new HBox(16);
                 playlistsBox.setAlignment(Pos.CENTER);
                 for (Playlist p : stubPlaylists) {
@@ -62,6 +66,15 @@ public class HomeScreen extends VBox {
                     }));
                 }
                 getChildren().add(playlistsBox);
+
+                addSectionTitle("Sheet notes");
+                HorizontalCarousel notesSection = new HorizontalCarousel("", new ArrayList<>(), 5);
+                getChildren().add(notesSection);
+                if (!notes.isEmpty()) {
+                    List<TrackCard> noteCards = new ArrayList<>();
+                    for (Note n : notes) noteCards.add(new TrackCard(n, item -> detailsHandler.accept(item)));
+                    notesSection.setCards(noteCards);
+                }
 
                 for (String genre : genres) {
                     addSectionTitle(genre);

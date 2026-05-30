@@ -15,6 +15,7 @@ const noteRoutes = require('./routes/noteRoutes');
 const playlistRoutes = require('./routes/playlistRoutes');
 const spotifyRoutes = require('./routes/spotifyRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
+const recentPlayRoutes = require('./routes/recentPlayRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -61,6 +62,7 @@ app.use('/api/notes', noteRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/spotify', spotifyRoutes);
 app.use('/api/favorites', favoriteRoutes);
+app.use('/api/recent-plays', recentPlayRoutes);
 
 app.use(errorMiddleware);
 
