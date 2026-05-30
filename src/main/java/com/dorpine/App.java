@@ -1,6 +1,7 @@
 package com.dorpine;
 
 import com.dorpine.model.Note;
+import com.dorpine.model.Playlist;
 import com.dorpine.model.Track;
 import com.dorpine.ui.components.DetailsPanel;
 import com.dorpine.ui.components.TopBar;
@@ -110,7 +111,13 @@ public class App extends Application {
             case "piano"    -> root.getChildren().add(new PianoScreen(this::navigateTo));
             default -> {
                 if (screen.startsWith("playlist:")) {
-                    root.getChildren().add(new PlaylistDetailScreen(screen.substring("playlist:".length()), this::navigateTo));
+                    String name = screen.substring("playlist:".length());
+                    Playlist stub = new Playlist();
+                    stub.setName(name);
+                    if (name.equals("Liked")) stub.setDescription("Your favorite tracks");
+                    else if (name.equals("Recently Played")) stub.setDescription("Tracks you listened to");
+                    else if (name.equals("For Your Favs")) stub.setDescription("Meditation vibes");
+                    root.getChildren().add(new PlaylistDetailScreen(stub, this::navigateTo));
                 } else { showHome(); }
             }
         }
