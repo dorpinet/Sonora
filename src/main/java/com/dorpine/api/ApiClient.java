@@ -33,6 +33,36 @@ public class ApiClient {
 
     // ========== Auth ==========
 
+    private static String extractError(String body) {
+        String trimmed = body.trim();
+        if (trimmed.isEmpty()) return "Empty response";
+        if (trimmed.startsWith("<")) {
+            return "Server returned HTML (code " + trimmed.substring(0, Math.min(60, trimmed.length())) + "...)";
+        }
+        try {
+            JsonNode root = MAPPER.readTree(trimmed);
+            return root.has("error") ? root.get("error").asText() : "Request failed";
+        } catch (Exception e) {
+            return trimmed.substring(0, Math.min(120, trimmed.length()));
+        }
+    }
+
+    public static boolean wakeUp() {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/health"))
+                    .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() == 200;
+        } catch (Exception e) {
+            System.err.println("[API] Wake-up failed: " + e.getMessage());
+            return false;
+        }
+    }
+
     public static AuthResult login(String email, String password) {
         try {
             String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
@@ -46,6 +76,7 @@ public class ApiClient {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("[API] Login HTTP " + response.statusCode());
             if (response.statusCode() == 200) {
                 JsonNode root = MAPPER.readTree(response.body());
                 JsonNode tokens = root.get("tokens");
@@ -58,13 +89,11 @@ public class ApiClient {
                     return new AuthResult(true, null);
                 }
             } else {
-                JsonNode root = MAPPER.readTree(response.body());
-                String err = root.has("error") ? root.get("error").asText() : "Login failed";
-                return new AuthResult(false, err);
+                return new AuthResult(false, extractError(response.body()));
             }
         } catch (Exception e) {
             System.err.println("[API] Login error: " + e.getMessage());
-            return new AuthResult(false, "Network error");
+            return new AuthResult(false, "Network error: " + e.getMessage());
         }
         return new AuthResult(false, "Unknown error");
     }
@@ -82,16 +111,15 @@ public class ApiClient {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("[API] Register init HTTP " + response.statusCode());
             if (response.statusCode() == 200) {
                 return new AuthResult(true, null);
             } else {
-                JsonNode root = MAPPER.readTree(response.body());
-                String err = root.has("error") ? root.get("error").asText() : "Failed to send code";
-                return new AuthResult(false, err);
+                return new AuthResult(false, extractError(response.body()));
             }
         } catch (Exception e) {
             System.err.println("[API] Register init error: " + e.getMessage());
-            return new AuthResult(false, "Network error");
+            return new AuthResult(false, "Network error: " + e.getMessage());
         }
     }
 
@@ -109,6 +137,7 @@ public class ApiClient {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("[API] Register verify HTTP " + response.statusCode());
             if (response.statusCode() == 201) {
                 JsonNode root = MAPPER.readTree(response.body());
                 JsonNode tokens = root.get("tokens");
@@ -121,13 +150,11 @@ public class ApiClient {
                     return new AuthResult(true, null);
                 }
             } else {
-                JsonNode root = MAPPER.readTree(response.body());
-                String err = root.has("error") ? root.get("error").asText() : "Registration failed";
-                return new AuthResult(false, err);
+                return new AuthResult(false, extractError(response.body()));
             }
         } catch (Exception e) {
             System.err.println("[API] Register verify error: " + e.getMessage());
-            return new AuthResult(false, "Network error");
+            return new AuthResult(false, "Network error: " + e.getMessage());
         }
         return new AuthResult(false, "Unknown error");
     }
@@ -145,16 +172,15 @@ public class ApiClient {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("[API] Forgot password HTTP " + response.statusCode());
             if (response.statusCode() == 200) {
                 return new AuthResult(true, null);
             } else {
-                JsonNode root = MAPPER.readTree(response.body());
-                String err = root.has("error") ? root.get("error").asText() : "Failed to send reset code";
-                return new AuthResult(false, err);
+                return new AuthResult(false, extractError(response.body()));
             }
         } catch (Exception e) {
             System.err.println("[API] Forgot password error: " + e.getMessage());
-            return new AuthResult(false, "Network error");
+            return new AuthResult(false, "Network error: " + e.getMessage());
         }
     }
 
@@ -192,16 +218,15 @@ public class ApiClient {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
             HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("[API] Reset password HTTP " + response.statusCode());
             if (response.statusCode() == 200) {
                 return new AuthResult(true, null);
             } else {
-                JsonNode root = MAPPER.readTree(response.body());
-                String err = root.has("error") ? root.get("error").asText() : "Reset failed";
-                return new AuthResult(false, err);
+                return new AuthResult(false, extractError(response.body()));
             }
         } catch (Exception e) {
             System.err.println("[API] Reset password error: " + e.getMessage());
-            return new AuthResult(false, "Network error");
+            return new AuthResult(false, "Network error: " + e.getMessage());
         }
     }
 

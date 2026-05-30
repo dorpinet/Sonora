@@ -44,6 +44,16 @@ public class AuthScreen extends StackPane {
         Region overlay = new Region();
         overlay.setStyle("-fx-background-color: rgba(10,10,18,0.6);");
 
+        // Ping server in background to wake it up
+        new Thread(() -> {
+            boolean ok = com.dorpine.api.ApiClient.wakeUp();
+            Platform.runLater(() -> {
+                if (!ok) {
+                    showError("Server is waking up. Please wait and try again.");
+                }
+            });
+        }).start();
+
         card = new VBox(10);
         card.setAlignment(Pos.TOP_CENTER);
         card.setPrefWidth(340);
