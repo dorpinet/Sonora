@@ -53,7 +53,7 @@ class PlaylistController {
       const validTracks = await Track.find({ _id: { $in: trackIds } });
 
       const playlistTracks = validTracks.map(t => ({
-        trackId: t._id,
+        trackId: String(t._id),
         title: t.title,
         artist: t.artist,
         coverUrl: t.coverUrl,
@@ -103,7 +103,7 @@ class PlaylistController {
         const trackIds = tracks.map(t => t.trackId || t);
         const validTracks = await Track.find({ _id: { $in: trackIds } });
         updates.tracks = validTracks.map(t => ({
-          trackId: t._id,
+          trackId: String(t._id),
           title: t.title,
           artist: t.artist,
           coverUrl: t.coverUrl,

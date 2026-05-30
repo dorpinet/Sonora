@@ -83,7 +83,7 @@ async function seed() {
       console.log('Creating user playlists...');
 
       const likedTracks = tracks.slice(0, 5).map(t => ({
-        trackId: t._id,
+        trackId: String(t._id),
         title: t.title,
         artist: t.artist,
         coverUrl: t.coverUrl,
@@ -91,7 +91,7 @@ async function seed() {
       }));
 
       const recentTracks = tracks.slice(3, 8).map(t => ({
-        trackId: t._id,
+        trackId: String(t._id),
         title: t.title,
         artist: t.artist,
         coverUrl: t.coverUrl,
@@ -99,7 +99,7 @@ async function seed() {
       }));
 
       const dailyTracks = tracks.slice(5, 12).map(t => ({
-        trackId: t._id,
+        trackId: String(t._id),
         title: t.title,
         artist: t.artist,
         coverUrl: t.coverUrl,

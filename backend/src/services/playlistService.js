@@ -46,7 +46,7 @@ class PlaylistService {
     }
 
     const playlistTracks = tracks.map(t => ({
-      trackId: t._id,
+      trackId: String(t._id),
       title: t.title,
       artist: t.artist,
       coverUrl: t.coverUrl,

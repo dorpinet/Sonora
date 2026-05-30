@@ -28,8 +28,8 @@ const playlistSchema = new mongoose.Schema({
   },
   tracks: [{
     trackId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Track',
+      type: String,
+      default: null,
     },
     title: String,
     artist: String,
