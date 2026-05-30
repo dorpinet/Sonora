@@ -40,15 +40,13 @@ public class PlaylistDetailScreen extends StackPane {
 
         HBox contentBox = new HBox(24);
         contentBox.setAlignment(Pos.TOP_CENTER);
-        contentBox.setFillHeight(false);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
         VBox.setVgrow(contentBox, Priority.ALWAYS);
         contentBox.setMaxWidth(Double.MAX_VALUE);
 
-        VBox playlistCard = new VBox(8);
+        VBox playlistCard = new VBox(10);
         playlistCard.setAlignment(Pos.TOP_CENTER);
         playlistCard.setPadding(new Insets(16));
-        playlistCard.setMaxHeight(Region.USE_PREF_SIZE);
         playlistCard.setStyle(String.join(";",
             "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.45)"),
             "-fx-background-radius: 16px",
@@ -59,24 +57,25 @@ public class PlaylistDetailScreen extends StackPane {
         playlistCard.setPrefWidth(340);
         playlistCard.setMaxWidth(400);
         playlistCard.setMinWidth(300);
+        playlistCard.setMaxHeight(Region.USE_PREF_SIZE);
 
         StackPane coverPane = new StackPane();
-        coverPane.setPrefSize(150, 150);
-        coverPane.setMinSize(150, 150);
-        coverPane.setMaxSize(150, 150);
-        coverPane.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.2)")) + "; -fx-background-radius: 16px;");
+        coverPane.setPrefSize(140, 140);
+        coverPane.setMinSize(140, 140);
+        coverPane.setMaxSize(140, 140);
+        coverPane.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.2)")) + "; -fx-background-radius: 14px;");
 
         String coverUrl = playlist.getCoverUrl();
         if (coverUrl != null && !coverUrl.isEmpty()) {
             try {
-                Image img = new Image(coverUrl, 150, 150, true, true, true);
+                Image img = new Image(coverUrl, 140, 140, true, true, true);
                 ImageView iv = new ImageView(img);
-                iv.setFitWidth(150);
-                iv.setFitHeight(150);
+                iv.setFitWidth(140);
+                iv.setFitHeight(140);
                 iv.setPreserveRatio(true);
-                Rectangle c = new Rectangle(150, 150);
-                c.setArcWidth(16);
-                c.setArcHeight(16);
+                Rectangle c = new Rectangle(140, 140);
+                c.setArcWidth(14);
+                c.setArcHeight(14);
                 iv.setClip(c);
                 coverPane.getChildren().add(iv);
             } catch (Exception e) {
