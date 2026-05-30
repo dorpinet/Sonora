@@ -1,14 +1,11 @@
 package com.dorpine.ui.screens;
 
-import com.dorpine.api.ApiClient;
 import com.dorpine.model.Playlist;
-import com.dorpine.model.Track;
+import com.dorpine.ui.components.TopBar;
 import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -17,7 +14,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class PlaylistDetailScreen extends StackPane {
@@ -31,82 +27,53 @@ public class PlaylistDetailScreen extends StackPane {
     private void build(Playlist playlist) {
         setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
 
-        VBox mainBox = new VBox(20);
+        VBox mainBox = new VBox(16);
         mainBox.setAlignment(Pos.TOP_CENTER);
         mainBox.setPadding(new Insets(20, 24, 24, 24));
         mainBox.setFillWidth(true);
 
-        // Top-right controls
-        HBox topControls = new HBox();
-        topControls.setAlignment(Pos.TOP_RIGHT);
-        topControls.setSpacing(12);
+        // Full top bar
+        TopBar topBar = new TopBar(navHandler, null);
+        topBar.setPadding(new Insets(0, 0, 8, 0));
 
-        Button backBtn = new Button("\u2190");
-        backBtn.setFont(Fonts.body(16));
-        backBtn.setStyle(String.join(";",
-            "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.6)"),
-            "-fx-text-fill: " + Theme.toCss(Theme.textPrimary()),
-            "-fx-background-radius: 12px",
-            "-fx-min-width: 36px",
-            "-fx-min-height: 36px",
-            "-fx-cursor: hand"
-        ));
-        backBtn.setOnAction(e -> navHandler.accept("home"));
-
-        ImageView logo = new ImageView();
-        try {
-            Image img = new Image(getClass().getResourceAsStream("/images/logo.png"));
-            logo.setImage(img);
-        } catch (Exception e) {}
-        logo.setFitWidth(32);
-        logo.setFitHeight(32);
-        logo.setPreserveRatio(true);
-        Rectangle clip = new Rectangle(32, 32);
-        clip.setArcWidth(8);
-        clip.setArcHeight(8);
-        logo.setClip(clip);
-
-        topControls.getChildren().addAll(backBtn, logo);
-
-        // Main content: left playlist card + right tracklist
+        // Main content: compact left card + right tracklist
         HBox contentBox = new HBox(24);
         contentBox.setAlignment(Pos.TOP_CENTER);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
         VBox.setVgrow(contentBox, Priority.ALWAYS);
 
-        // Left: playlist info card
-        StackPane playlistCard = new StackPane();
+        // Left: compact playlist card
+        VBox playlistCard = new VBox(10);
+        playlistCard.setAlignment(Pos.TOP_CENTER);
+        playlistCard.setPadding(new Insets(16));
         playlistCard.setStyle(String.join(";",
             "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.45)"),
-            "-fx-background-radius: 20px",
+            "-fx-background-radius: 16px",
             "-fx-border-color: " + (Theme.isDark() ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.7)"),
-            "-fx-border-radius: 20px",
+            "-fx-border-radius: 16px",
             "-fx-border-width: 1px"
         ));
-        playlistCard.setPadding(new Insets(20));
-        playlistCard.setPrefWidth(340);
-        playlistCard.setMaxWidth(380);
-
-        VBox playlistInfo = new VBox(12);
-        playlistInfo.setAlignment(Pos.TOP_CENTER);
+        playlistCard.setPrefWidth(220);
+        playlistCard.setMaxWidth(240);
+        playlistCard.setMinWidth(200);
 
         StackPane coverPane = new StackPane();
-        coverPane.setPrefSize(200, 200);
-        coverPane.setMinSize(200, 200);
-        coverPane.setMaxSize(200, 200);
-        coverPane.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.2)")) + "; -fx-background-radius: 16px;");
+        coverPane.setPrefSize(140, 140);
+        coverPane.setMinSize(140, 140);
+        coverPane.setMaxSize(140, 140);
+        coverPane.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.2)")) + "; -fx-background-radius: 12px;");
 
         String coverUrl = playlist.getCoverUrl();
         if (coverUrl != null && !coverUrl.isEmpty()) {
             try {
-                Image img = new Image(coverUrl, 200, 200, true, true, true);
+                Image img = new Image(coverUrl, 140, 140, true, true, true);
                 ImageView iv = new ImageView(img);
-                iv.setFitWidth(200);
-                iv.setFitHeight(200);
+                iv.setFitWidth(140);
+                iv.setFitHeight(140);
                 iv.setPreserveRatio(true);
-                Rectangle c = new Rectangle(200, 200);
-                c.setArcWidth(16);
-                c.setArcHeight(16);
+                Rectangle c = new Rectangle(140, 140);
+                c.setArcWidth(12);
+                c.setArcHeight(12);
                 iv.setClip(c);
                 coverPane.getChildren().add(iv);
             } catch (Exception e) {
@@ -117,19 +84,20 @@ public class PlaylistDetailScreen extends StackPane {
         }
 
         Label nameLbl = new Label(playlist.getName());
-        nameLbl.setFont(Fonts.heading(22));
+        nameLbl.setFont(Fonts.heading(16));
         nameLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         nameLbl.setAlignment(Pos.CENTER);
         nameLbl.setWrapText(true);
+        nameLbl.setMaxWidth(180);
 
         Label descLbl = new Label(playlist.getDescription() != null ? playlist.getDescription() : "");
-        descLbl.setFont(Fonts.body(14));
+        descLbl.setFont(Fonts.body(12));
         descLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
         descLbl.setAlignment(Pos.CENTER);
         descLbl.setWrapText(true);
+        descLbl.setMaxWidth(180);
 
-        playlistInfo.getChildren().addAll(coverPane, nameLbl, descLbl);
-        playlistCard.getChildren().add(playlistInfo);
+        playlistCard.getChildren().addAll(coverPane, nameLbl, descLbl);
 
         // Right: tracklist panel
         StackPane tracklistPanel = new StackPane();
@@ -165,10 +133,10 @@ public class PlaylistDetailScreen extends StackPane {
         trackContent.setAlignment(Pos.TOP_CENTER);
         trackContent.setFillWidth(true);
 
-        List<Playlist.PlaylistTrack> tracks = playlist.getTracks();
+        var tracks = playlist.getTracks();
         if (tracks != null && !tracks.isEmpty()) {
             int idx = 1;
-            for (Playlist.PlaylistTrack pt : tracks) {
+            for (var pt : tracks) {
                 HBox trackRow = new HBox(12);
                 trackRow.setAlignment(Pos.CENTER_LEFT);
                 trackRow.setPadding(new Insets(8, 12, 8, 12));
@@ -208,14 +176,14 @@ public class PlaylistDetailScreen extends StackPane {
 
         contentBox.getChildren().addAll(playlistCard, tracklistPanel);
 
-        mainBox.getChildren().addAll(topControls, contentBox);
+        mainBox.getChildren().addAll(topBar, contentBox);
         getChildren().add(mainBox);
     }
 
     private void showCoverPlaceholder(StackPane pane, String name) {
         pane.getChildren().clear();
         Label l = new Label(name != null && !name.isEmpty() ? name.substring(0, 1).toUpperCase() : "?");
-        l.setFont(Fonts.heading(48));
+        l.setFont(Fonts.heading(36));
         l.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + ";");
         pane.getChildren().add(l);
     }

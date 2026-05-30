@@ -1,10 +1,8 @@
 package com.dorpine.ui.screens;
 
-import com.dorpine.api.ApiClient;
 import com.dorpine.model.Note;
 import com.dorpine.util.Fonts;
 import com.dorpine.util.Theme;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -16,16 +14,16 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class PianoScreen extends StackPane {
+    private final Note note;
     private final Consumer<String> navHandler;
 
-    public PianoScreen(Consumer<String> navHandler) {
+    public PianoScreen(Note note, Consumer<String> navHandler) {
+        this.note = note;
         this.navHandler = navHandler;
         build();
-        loadNotes();
     }
 
     private void build() {
@@ -41,7 +39,6 @@ public class PianoScreen extends StackPane {
         topControls.setAlignment(Pos.TOP_RIGHT);
         topControls.setSpacing(12);
 
-        // Back button (small plaque)
         Button backBtn = new Button("\u2190");
         backBtn.setFont(Fonts.body(16));
         backBtn.setStyle(String.join(";",
@@ -54,7 +51,6 @@ public class PianoScreen extends StackPane {
         ));
         backBtn.setOnAction(e -> navHandler.accept("home"));
 
-        // Logo
         ImageView logo = new ImageView();
         try {
             Image img = new Image(getClass().getResourceAsStream("/images/logo.png"));
@@ -70,7 +66,7 @@ public class PianoScreen extends StackPane {
 
         topControls.getChildren().addAll(backBtn, logo);
 
-        // Notes viewer (glass card)
+        // Notes viewer - FIXED max height so piano doesn't get squished
         StackPane notesCard = new StackPane();
         notesCard.setStyle(String.join(";",
             "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.45)"),
@@ -80,7 +76,9 @@ public class PianoScreen extends StackPane {
             "-fx-border-width: 1px"
         ));
         notesCard.setPadding(new Insets(16));
-        VBox.setVgrow(notesCard, Priority.ALWAYS);
+        notesCard.setMaxHeight(320);
+        notesCard.setPrefHeight(300);
+        VBox.setVgrow(notesCard, Priority.NEVER);
 
         ScrollPane notesScroll = new ScrollPane();
         notesScroll.setFitToWidth(true);
@@ -91,53 +89,67 @@ public class PianoScreen extends StackPane {
 
         VBox notesContent = new VBox(12);
         notesContent.setAlignment(Pos.TOP_CENTER);
-        notesContent.setId("notesContent");
+        notesContent.setFillWidth(true);
+
+        loadNoteContent(notesContent);
 
         notesScroll.setContent(notesContent);
         notesCard.getChildren().add(notesScroll);
 
-        // Piano keys
+        // Piano keys - fixed large height
         PianoKeys piano = new PianoKeys();
-        piano.setPrefHeight(160);
-        piano.setMaxHeight(180);
+        piano.setPrefHeight(240);
+        piano.setMinHeight(200);
+        piano.setMaxHeight(280);
         VBox.setVgrow(piano, Priority.NEVER);
 
-        mainBox.getChildren().addAll(topControls, notesCard, piano);
+        // Prompt text for hotkeys
+        Label hint = new Label("Hotkeys: Z X C V B N M , . / Q W E R T Y U  |  Black: S D G H J L ; 2 3 5 6 7");
+        hint.setFont(Fonts.body(11));
+        hint.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
+        hint.setAlignment(Pos.CENTER);
+
+        mainBox.getChildren().addAll(topControls, notesCard, hint, piano);
         getChildren().add(mainBox);
+
+        // Focus piano for keyboard input
+        Platform.runLater(() -> piano.requestFocus());
     }
 
-    private void loadNotes() {
-        new Thread(() -> {
-            List<Note> notes = ApiClient.getNotes();
-            Platform.runLater(() -> {
-                VBox content = (VBox) lookup("#notesContent");
-                if (content == null) return;
-                content.getChildren().clear();
+    private void loadNoteContent(VBox content) {
+        content.getChildren().clear();
 
-                if (notes.isEmpty()) {
-                    Label empty = new Label("No sheet music available");
-                    empty.setFont(Fonts.body(16));
-                    empty.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
-                    content.getChildren().add(empty);
-                    return;
-                }
+        if (note == null) {
+            Label empty = new Label("Select a track with sheet music");
+            empty.setFont(Fonts.body(16));
+            empty.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
+            content.getChildren().add(empty);
+            return;
+        }
 
-                for (Note note : notes) {
-                    if (note.getImageUrl() != null && !note.getImageUrl().isEmpty()) {
-                        ImageView iv = new ImageView();
-                        try {
-                            Image img = new Image(note.getImageUrl(), 700, 0, true, true, true);
-                            iv.setImage(img);
-                            iv.setFitWidth(700);
-                            iv.setPreserveRatio(true);
-                            iv.setStyle("-fx-background-radius: 12px;");
-                        } catch (Exception e) {
-                            continue;
-                        }
-                        content.getChildren().add(iv);
-                    }
-                }
-            });
-        }).start();
+        String url = note.getImageUrl() != null ? note.getImageUrl() : note.getCoverUrl();
+        if (url != null && !url.isEmpty()) {
+            ImageView iv = new ImageView();
+            try {
+                Image img = new Image(url, 700, 0, true, true, true);
+                iv.setImage(img);
+                iv.setFitWidth(700);
+                iv.setPreserveRatio(true);
+                iv.setStyle("-fx-background-radius: 12px;");
+            } catch (Exception e) {
+                showError(content, "Failed to load sheet music");
+                return;
+            }
+            content.getChildren().add(iv);
+        } else {
+            showError(content, "No sheet music available for this track");
+        }
+    }
+
+    private void showError(VBox content, String msg) {
+        Label err = new Label(msg);
+        err.setFont(Fonts.body(16));
+        err.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
+        content.getChildren().add(err);
     }
 }

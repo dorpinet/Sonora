@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 public class App extends Application {
     private StackPane root;
     private DetailsPanel detailsPanel;
+    private Object currentItem;
 
     @Override
     public void start(Stage stage) {
@@ -76,6 +77,7 @@ public class App extends Application {
     }
 
     private void showDetails(Object item) {
+        currentItem = item;
         if (item instanceof Track t) {
             detailsPanel.showTrack(t);
             String sid = t.getSpotifyId();
@@ -108,7 +110,10 @@ public class App extends Application {
         switch (screen) {
             case "settings" -> root.getChildren().add(new SettingsScreen(this::navigateTo));
             case "theory"   -> root.getChildren().add(new TheoryScreen(this::navigateTo));
-            case "piano"    -> root.getChildren().add(new PianoScreen(this::navigateTo));
+            case "piano"    -> {
+                Note note = (currentItem instanceof Note n) ? n : null;
+                root.getChildren().add(new PianoScreen(note, this::navigateTo));
+            }
             default -> {
                 if (screen.startsWith("playlist:")) {
                     String name = screen.substring("playlist:".length());
