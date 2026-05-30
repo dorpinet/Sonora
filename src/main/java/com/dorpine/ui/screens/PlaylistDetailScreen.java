@@ -28,24 +28,23 @@ public class PlaylistDetailScreen extends StackPane {
         setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
 
         VBox mainBox = new VBox(16);
-        mainBox.setAlignment(Pos.TOP_CENTER);
+        mainBox.setAlignment(Pos.TOP_LEFT);
         mainBox.setPadding(new Insets(20, 24, 24, 24));
         mainBox.setFillWidth(true);
 
-        // Full top bar
         TopBar topBar = new TopBar(navHandler, null);
-        topBar.setPadding(new Insets(0, 0, 8, 0));
+        topBar.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(topBar, Priority.NEVER);
 
-        // Main content: compact left card + right tracklist
         HBox contentBox = new HBox(24);
         contentBox.setAlignment(Pos.TOP_CENTER);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
         VBox.setVgrow(contentBox, Priority.ALWAYS);
+        contentBox.setMaxWidth(Double.MAX_VALUE);
 
-        // Left: compact playlist card
-        VBox playlistCard = new VBox(10);
+        VBox playlistCard = new VBox(6);
         playlistCard.setAlignment(Pos.TOP_CENTER);
-        playlistCard.setPadding(new Insets(16));
+        playlistCard.setPadding(new Insets(12));
         playlistCard.setStyle(String.join(";",
             "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.45)"),
             "-fx-background-radius: 16px",
@@ -53,25 +52,25 @@ public class PlaylistDetailScreen extends StackPane {
             "-fx-border-radius: 16px",
             "-fx-border-width: 1px"
         ));
-        playlistCard.setPrefWidth(220);
-        playlistCard.setMaxWidth(240);
-        playlistCard.setMinWidth(200);
+        playlistCard.setPrefWidth(340);
+        playlistCard.setMaxWidth(400);
+        playlistCard.setMinWidth(300);
 
         StackPane coverPane = new StackPane();
-        coverPane.setPrefSize(140, 140);
-        coverPane.setMinSize(140, 140);
-        coverPane.setMaxSize(140, 140);
+        coverPane.setPrefSize(90, 90);
+        coverPane.setMinSize(90, 90);
+        coverPane.setMaxSize(90, 90);
         coverPane.setStyle("-fx-background-color: " + Theme.toCss(Color.web("rgba(200,190,255,0.2)")) + "; -fx-background-radius: 12px;");
 
         String coverUrl = playlist.getCoverUrl();
         if (coverUrl != null && !coverUrl.isEmpty()) {
             try {
-                Image img = new Image(coverUrl, 140, 140, true, true, true);
+                Image img = new Image(coverUrl, 90, 90, true, true, true);
                 ImageView iv = new ImageView(img);
-                iv.setFitWidth(140);
-                iv.setFitHeight(140);
+                iv.setFitWidth(90);
+                iv.setFitHeight(90);
                 iv.setPreserveRatio(true);
-                Rectangle c = new Rectangle(140, 140);
+                Rectangle c = new Rectangle(90, 90);
                 c.setArcWidth(12);
                 c.setArcHeight(12);
                 iv.setClip(c);
@@ -88,18 +87,17 @@ public class PlaylistDetailScreen extends StackPane {
         nameLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + ";");
         nameLbl.setAlignment(Pos.CENTER);
         nameLbl.setWrapText(true);
-        nameLbl.setMaxWidth(180);
+        nameLbl.setMaxWidth(360);
 
         Label descLbl = new Label(playlist.getDescription() != null ? playlist.getDescription() : "");
         descLbl.setFont(Fonts.body(12));
         descLbl.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textSecondary()) + ";");
         descLbl.setAlignment(Pos.CENTER);
         descLbl.setWrapText(true);
-        descLbl.setMaxWidth(180);
+        descLbl.setMaxWidth(360);
 
         playlistCard.getChildren().addAll(coverPane, nameLbl, descLbl);
 
-        // Right: tracklist panel
         StackPane tracklistPanel = new StackPane();
         tracklistPanel.setStyle(String.join(";",
             "-fx-background-color: " + (Theme.isDark() ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.45)"),
@@ -183,7 +181,7 @@ public class PlaylistDetailScreen extends StackPane {
     private void showCoverPlaceholder(StackPane pane, String name) {
         pane.getChildren().clear();
         Label l = new Label(name != null && !name.isEmpty() ? name.substring(0, 1).toUpperCase() : "?");
-        l.setFont(Fonts.heading(36));
+        l.setFont(Fonts.heading(32));
         l.setStyle("-fx-text-fill: " + Theme.toCss(Theme.accent()) + ";");
         pane.getChildren().add(l);
     }

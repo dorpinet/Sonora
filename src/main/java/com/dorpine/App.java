@@ -108,7 +108,8 @@ public class App extends Application {
         root.getChildren().clear();
         root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
         switch (screen) {
-            case "settings" -> root.getChildren().add(new SettingsScreen(this::navigateTo));
+            case "settings", "account" -> root.getChildren().add(new SettingsScreen(this::navigateTo));
+            case "library" -> root.getChildren().add(new LibraryScreen(this::navigateTo));
             case "theory"   -> root.getChildren().add(new TheoryScreen(this::navigateTo));
             case "piano"    -> {
                 Note note = (currentItem instanceof Note n) ? n : null;

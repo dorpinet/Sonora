@@ -69,9 +69,9 @@ public class TopBar extends HBox {
         HBox navBox = new HBox(24);
         navBox.setAlignment(Pos.CENTER);
         navBox.getChildren().addAll(
-            navBtn("Home", true),
-            navBtn("Settings", false),
-            navBtn("Theory", false)
+            navBtn("Home", false),
+            navBtn("My library", false),
+            navBtn("My account", false)
         );
 
         Region spacer2 = new Region();
@@ -109,7 +109,11 @@ public class TopBar extends HBox {
             "-fx-cursor: hand"
         ));
         l.setOnMouseClicked(e -> {
-            if (!active && navHandler != null) navHandler.accept(text.toLowerCase());
+            if (navHandler != null) {
+                if (text.equals("Home")) navHandler.accept("home");
+                else if (text.equals("My library")) navHandler.accept("library");
+                else if (text.equals("My account")) navHandler.accept("account");
+            }
         });
         return l;
     }

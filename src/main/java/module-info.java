@@ -3,6 +3,7 @@ module com.dorpine {
     requires javafx.media;
     requires com.fasterxml.jackson.databind;
     requires java.net.http;
+    requires java.desktop;
 
     opens com.dorpine.model to com.fasterxml.jackson.databind;
 
