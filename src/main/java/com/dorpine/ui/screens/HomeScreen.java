@@ -40,33 +40,7 @@ public class HomeScreen extends VBox {
             Playlist daily = ApiClient.getDaily();
 
             Platform.runLater(() -> {
-                // Daily Mix
-                if (daily != null) {
-                    addSectionTitle("Daily Mix");
-                    HBox dailyBox = new HBox(16);
-                    dailyBox.setAlignment(Pos.CENTER);
-                    dailyBox.getChildren().add(new TrackCard(daily, item -> {
-                        if (item instanceof Playlist pl) navHandler.accept("playlist:" + pl.getName());
-                    }));
-                    getChildren().add(dailyBox);
-                }
-
-                // My playlists (static stubs)
-                addSectionTitle("My playlists");
-                List<Playlist> stubPlaylists = new ArrayList<>();
-                Playlist liked = new Playlist(); liked.setName("Liked"); liked.setDescription("Explore new tracks!"); stubPlaylists.add(liked);
-                Playlist recent = new Playlist(); recent.setName("Recently Played"); recent.setDescription("Explore new tracks!"); stubPlaylists.add(recent);
-                Playlist favs = new Playlist(); favs.setName("For Your Favs"); favs.setDescription("Explore new tracks!"); stubPlaylists.add(favs);
-
-                HBox playlistsBox = new HBox(16);
-                playlistsBox.setAlignment(Pos.CENTER);
-                for (Playlist p : stubPlaylists) {
-                    playlistsBox.getChildren().add(new TrackCard(p, item -> {
-                        if (item instanceof Playlist pl) navHandler.accept("playlist:" + pl.getName());
-                    }));
-                }
-                getChildren().add(playlistsBox);
-
+                // 1. Sheet notes (always first)
                 addSectionTitle("Sheet notes");
                 HorizontalCarousel notesSection = new HorizontalCarousel("", new ArrayList<>(), 5);
                 getChildren().add(notesSection);
@@ -76,6 +50,34 @@ public class HomeScreen extends VBox {
                     notesSection.setCards(noteCards);
                 }
 
+                // 2. My playlists (Liked, Recently Played, Daily Mix)
+                addSectionTitle("My playlists");
+                HBox playlistsBox = new HBox(16);
+                playlistsBox.setAlignment(Pos.CENTER);
+
+                Playlist liked = new Playlist();
+                liked.setName("Liked");
+                liked.setDescription("Explore new tracks!");
+                playlistsBox.getChildren().add(new TrackCard(liked, item -> {
+                    if (item instanceof Playlist pl) navHandler.accept("playlist:" + pl.getName());
+                }));
+
+                Playlist recent = new Playlist();
+                recent.setName("Recently Played");
+                recent.setDescription("Explore new tracks!");
+                playlistsBox.getChildren().add(new TrackCard(recent, item -> {
+                    if (item instanceof Playlist pl) navHandler.accept("playlist:" + pl.getName());
+                }));
+
+                if (daily != null) {
+                    playlistsBox.getChildren().add(new TrackCard(daily, item -> {
+                        if (item instanceof Playlist pl) navHandler.accept("playlist:" + pl.getName());
+                    }));
+                }
+
+                getChildren().add(playlistsBox);
+
+                // 3. Genres
                 for (String genre : genres) {
                     addSectionTitle(genre);
                     HorizontalCarousel gs = new HorizontalCarousel("", new ArrayList<>(), 5);

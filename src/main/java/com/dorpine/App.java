@@ -131,12 +131,24 @@ public class App extends Application {
             default -> {
                 if (screen.startsWith("playlist:")) {
                     String name = screen.substring("playlist:".length());
-                    Playlist stub = new Playlist();
-                    stub.setName(name);
-                    if (name.equals("Liked")) stub.setDescription("Your favorite tracks");
-                    else if (name.equals("Recently Played")) stub.setDescription("Tracks you listened to");
-                    else if (name.equals("For Your Favs")) stub.setDescription("Meditation vibes");
-                    root.getChildren().add(new PlaylistDetailScreen(stub, this::navigateTo, () -> Platform.runLater(this::toggleTheme)));
+                    if (name.equals("Daily Mix")) {
+                        new Thread(() -> {
+                            Playlist daily = com.dorpine.api.ApiClient.getDaily();
+                            Platform.runLater(() -> {
+                                if (daily != null) {
+                                    root.getChildren().add(new PlaylistDetailScreen(daily, this::navigateTo, () -> Platform.runLater(this::toggleTheme)));
+                                } else {
+                                    showHome();
+                                }
+                            });
+                        }).start();
+                    } else {
+                        Playlist stub = new Playlist();
+                        stub.setName(name);
+                        if (name.equals("Liked")) stub.setDescription("Your favorite tracks");
+                        else if (name.equals("Recently Played")) stub.setDescription("Tracks you listened to");
+                        root.getChildren().add(new PlaylistDetailScreen(stub, this::navigateTo, () -> Platform.runLater(this::toggleTheme)));
+                    }
                 } else { showHome(); }
             }
         }
