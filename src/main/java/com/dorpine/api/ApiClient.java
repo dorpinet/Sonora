@@ -3,6 +3,8 @@ package com.dorpine.api;
 import com.dorpine.model.Note;
 import com.dorpine.model.Playlist;
 import com.dorpine.model.Track;
+import com.dorpine.model.UserProfile;
+import com.dorpine.util.Session;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +30,182 @@ public class ApiClient {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private ApiClient() {}
+
+    // ========== Auth ==========
+
+    public static AuthResult login(String email, String password) {
+        try {
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("email", email); put("password", password);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/login"))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JsonNode root = MAPPER.readTree(response.body());
+                JsonNode tokens = root.get("tokens");
+                JsonNode user = root.get("user");
+                if (tokens != null && user != null) {
+                    Session.setAccessToken(tokens.get("accessToken").asText());
+                    Session.setRefreshToken(tokens.get("refreshToken").asText());
+                    UserProfile profile = MAPPER.treeToValue(user, UserProfile.class);
+                    Session.setCurrentUser(profile);
+                    return new AuthResult(true, null);
+                }
+            } else {
+                JsonNode root = MAPPER.readTree(response.body());
+                String err = root.has("error") ? root.get("error").asText() : "Login failed";
+                return new AuthResult(false, err);
+            }
+        } catch (Exception e) {
+            System.err.println("[API] Login error: " + e.getMessage());
+            return new AuthResult(false, "Network error");
+        }
+        return new AuthResult(false, "Unknown error");
+    }
+
+    public static AuthResult registerInit(String email) {
+        try {
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("email", email);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/register-init"))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new AuthResult(true, null);
+            } else {
+                JsonNode root = MAPPER.readTree(response.body());
+                String err = root.has("error") ? root.get("error").asText() : "Failed to send code";
+                return new AuthResult(false, err);
+            }
+        } catch (Exception e) {
+            System.err.println("[API] Register init error: " + e.getMessage());
+            return new AuthResult(false, "Network error");
+        }
+    }
+
+    public static AuthResult registerVerify(String email, String code, String username, String password, String confirmPassword) {
+        try {
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("email", email); put("code", code); put("username", username);
+                put("password", password); put("confirmPassword", confirmPassword);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/register-verify"))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 201) {
+                JsonNode root = MAPPER.readTree(response.body());
+                JsonNode tokens = root.get("tokens");
+                JsonNode user = root.get("user");
+                if (tokens != null && user != null) {
+                    Session.setAccessToken(tokens.get("accessToken").asText());
+                    Session.setRefreshToken(tokens.get("refreshToken").asText());
+                    UserProfile profile = MAPPER.treeToValue(user, UserProfile.class);
+                    Session.setCurrentUser(profile);
+                    return new AuthResult(true, null);
+                }
+            } else {
+                JsonNode root = MAPPER.readTree(response.body());
+                String err = root.has("error") ? root.get("error").asText() : "Registration failed";
+                return new AuthResult(false, err);
+            }
+        } catch (Exception e) {
+            System.err.println("[API] Register verify error: " + e.getMessage());
+            return new AuthResult(false, "Network error");
+        }
+        return new AuthResult(false, "Unknown error");
+    }
+
+    public static AuthResult forgotPassword(String email) {
+        try {
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("email", email);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/forgot-password"))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new AuthResult(true, null);
+            } else {
+                JsonNode root = MAPPER.readTree(response.body());
+                String err = root.has("error") ? root.get("error").asText() : "Failed to send reset code";
+                return new AuthResult(false, err);
+            }
+        } catch (Exception e) {
+            System.err.println("[API] Forgot password error: " + e.getMessage());
+            return new AuthResult(false, "Network error");
+        }
+    }
+
+    public static AuthResult logout() {
+        try {
+            String token = Session.getAccessToken();
+            if (token == null) return new AuthResult(true, null);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/logout"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+            CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return new AuthResult(true, null);
+        } catch (Exception e) {
+            return new AuthResult(true, null);
+        } finally {
+            Session.clear();
+        }
+    }
+
+    public static AuthResult resetPassword(String email, String code, String password, String confirmPassword) {
+        try {
+            String json = MAPPER.writeValueAsString(new java.util.HashMap<String, String>() {{
+                put("email", email); put("code", code);
+                put("password", password); put("confirmPassword", confirmPassword);
+            }});
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/reset-password"))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new AuthResult(true, null);
+            } else {
+                JsonNode root = MAPPER.readTree(response.body());
+                String err = root.has("error") ? root.get("error").asText() : "Reset failed";
+                return new AuthResult(false, err);
+            }
+        } catch (Exception e) {
+            System.err.println("[API] Reset password error: " + e.getMessage());
+            return new AuthResult(false, "Network error");
+        }
+    }
+
+    // ========== Data ==========
 
     public static List<Track> getTracks(String genre) {
         try {
@@ -140,5 +318,14 @@ public class ApiClient {
             System.err.println("[API] Preview error: " + e.getMessage());
         }
         return null;
+    }
+
+    public static class AuthResult {
+        public final boolean success;
+        public final String error;
+        public AuthResult(boolean success, String error) {
+            this.success = success;
+            this.error = error;
+        }
     }
 }

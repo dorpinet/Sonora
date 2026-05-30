@@ -118,7 +118,10 @@ public class SettingsScreen extends StackPane {
         logout.setFont(Fonts.heading(18));
         logout.setStyle("-fx-text-fill: " + Theme.toCss(Theme.textPrimary()) + "; -fx-cursor: hand;");
         logout.setPadding(new Insets(12, 0, 0, 0));
-        logout.setOnMouseClicked(e -> navHandler.accept("home"));
+        logout.setOnMouseClicked(e -> {
+            com.dorpine.api.ApiClient.logout();
+            navHandler.accept("logout");
+        });
         settingsBox.getChildren().add(logout);
 
         settingsPanel.getChildren().add(settingsBox);

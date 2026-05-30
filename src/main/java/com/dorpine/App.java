@@ -7,6 +7,7 @@ import com.dorpine.ui.components.DetailsPanel;
 import com.dorpine.ui.components.TopBar;
 import com.dorpine.ui.screens.*;
 import com.dorpine.util.Fonts;
+import com.dorpine.util.Session;
 import com.dorpine.util.Theme;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -24,19 +25,34 @@ public class App extends Application {
     private DetailsPanel detailsPanel;
     private Object currentItem;
     private String currentScreen = "home";
+    private Stage primaryStage;
 
     @Override
     public void start(Stage stage) {
+        this.primaryStage = stage;
         Fonts.load();
         root = new StackPane();
         root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
-        showHome();
+        if (!Session.isAuthenticated()) {
+            showAuth();
+        } else {
+            showHome();
+        }
         Scene scene = new Scene(root, 1200, 800);
         stage.setTitle("SONORA");
         stage.setScene(scene);
         stage.setMinWidth(900);
         stage.setMinHeight(600);
         stage.show();
+    }
+
+    private void showAuth() {
+        root.getChildren().clear();
+        root.getChildren().add(new AuthScreen(this::onAuthSuccess));
+    }
+
+    private void onAuthSuccess() {
+        Platform.runLater(this::showHome);
     }
 
     private void showHome() {
@@ -107,6 +123,7 @@ public class App extends Application {
     private void navigateTo(String screen) {
         currentScreen = screen;
         if (screen.equals("home")) { showHome(); return; }
+        if (screen.equals("logout")) { showAuth(); return; }
         root.getChildren().clear();
         root.setStyle("-fx-background-color: " + Theme.GRADIENT_CSS() + ";");
         switch (screen) {
